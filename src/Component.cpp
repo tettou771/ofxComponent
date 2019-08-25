@@ -125,6 +125,14 @@ namespace ofxComponent {
 		}
 	}
 
+	void Component::dragEvent(ofDragInfo &dragInfo) {
+		onDragEvent(dragInfo);
+
+		for (auto &c : children) {
+			c->dragEvent(dragInfo);
+		}
+	}
+
 	ofRectangle Component::getRect() {
 		return rect;
 	}
@@ -317,6 +325,14 @@ namespace ofxComponent {
 			}
 		}
 	}
+	
+	Component * Component::getChild(int i) {
+		if (i < 0 || children.size() <= i) {
+			return nullptr;
+		}
+		return children[i];
+	}
+
 	void Component::updateMatrix() {
 		/*
 		localMatrix.translate(ofVec3f(rect.x - rect.width / 2, rect.y - rect.height / 2, 0));

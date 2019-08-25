@@ -47,6 +47,9 @@ namespace ofxComponent {
 		void mouseReleased(ofMouseEventArgs &);
 		virtual void onMouseReleased(ofMouseEventArgs &) {}
 
+		void dragEvent(ofDragInfo &);
+		virtual void onDragEvent(ofDragInfo &) {}
+
 		ofRectangle getRect();
 		ofRectangle getRectGlobal();
 		ofVec2f getPos();
@@ -86,6 +89,10 @@ namespace ofxComponent {
 		void addChild(Component *_child);
 		void insertChild(Component *_child, int index);
 		void removeChild(Component *_child);
+
+		// component getter
+		Component * getParent() { return parent; }
+		Component * getChild(int i);
 
 	private:
 		bool isActive = true;

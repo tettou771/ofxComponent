@@ -16,6 +16,7 @@ namespace ofxComponent {
 		ofRemoveListener(ofEvents().mousePressed, this, &ComponentManager::mousePressed, OF_EVENT_ORDER_BEFORE_APP);
 		ofRemoveListener(ofEvents().mouseDragged, this, &ComponentManager::mouseDragged, OF_EVENT_ORDER_BEFORE_APP);
 		ofRemoveListener(ofEvents().mouseReleased, this, &ComponentManager::mouseReleased, OF_EVENT_ORDER_BEFORE_APP);
+		ofRemoveListener(ofEvents().fileDragEvent, this, &ComponentManager::dragEvent, OF_EVENT_ORDER_BEFORE_APP);
 	}
 
 	void ComponentManager::onSetup() {
@@ -28,6 +29,7 @@ namespace ofxComponent {
 		ofAddListener(ofEvents().mousePressed, this, &ComponentManager::mousePressed, OF_EVENT_ORDER_BEFORE_APP);
 		ofAddListener(ofEvents().mouseDragged, this, &ComponentManager::mouseDragged, OF_EVENT_ORDER_BEFORE_APP);
 		ofAddListener(ofEvents().mouseReleased, this, &ComponentManager::mouseReleased, OF_EVENT_ORDER_BEFORE_APP);
+		ofAddListener(ofEvents().fileDragEvent, this, &ComponentManager::dragEvent, OF_EVENT_ORDER_BEFORE_APP);
 	}
 
 	void ComponentManager::update(ofEventArgs &args) {
@@ -56,5 +58,8 @@ namespace ofxComponent {
 	}
 	void ComponentManager::mouseReleased(ofMouseEventArgs &mouse) {
 		Component::mouseReleased(mouse);
+	}
+	void ComponentManager::dragEvent(ofDragInfo &dragInfo) {
+		Component::dragEvent(dragInfo);
 	}
 }
