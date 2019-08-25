@@ -16,7 +16,19 @@ namespace ofxComponent {
 		}
 	}
 
+	void Component::update(ofEventArgs &args) {
+		if (!isActive) return;
+
+		onUpdate();
+		for (auto &c : children) {
+			c->update(args);
+		}
+		postUpdate();
+	}
+
 	void Component::draw(ofEventArgs &args) {
+		if (!isActive) return;
+
 		ofPushMatrix();
 		ofMultMatrix(getLocalMatrix());
 
@@ -35,14 +47,6 @@ namespace ofxComponent {
 		ofPopMatrix();
 	}
 
-	void Component::update(ofEventArgs &args) {
-		onUpdate();
-		for (auto &c : children) {
-			c->update(args);
-		}
-		postUpdate();
-	}
-
 	void Component::exit(ofEventArgs &args) {
 		onExit();
 		for (auto &c : children) {
@@ -50,7 +54,15 @@ namespace ofxComponent {
 		}
 	}
 
+	void Component::setActive(bool active) {
+		if (isActive == active) return;
+		isActive = active;
+		onActiveChanged();
+	}
+
 	void Component::keyPressed(ofKeyEventArgs &key) {
+		if (!isActive) return;
+
 		onKeyPressed(key);
 		for (auto &c : children) {
 			c->keyPressed(key);
@@ -58,13 +70,17 @@ namespace ofxComponent {
 	}
 
 	void Component::keyReleased(ofKeyEventArgs &key) {
+		if (!isActive) return;
+
 		onKeyReleased(key);
 		for (auto &c : children) {
-			c->keyPressed(key);
+			c->keyReleased(key);
 		}
 	}
 
 	void Component::mouseMoved(ofMouseEventArgs &mouse) {
+		if (!isActive) return;
+
 		onMouseMoved(mouse);
 		for (auto &c : children) {
 			c->mouseMoved(mouse);
@@ -72,6 +88,8 @@ namespace ofxComponent {
 	}
 
 	void Component::mousePressed(ofMouseEventArgs &mouse) {
+		if (!isActive) return;
+
 		if (draggable && getRectGlobal().inside(ofGetMouseX(), ofGetMouseY())) {
 			dragging = true;
 		}
@@ -83,6 +101,8 @@ namespace ofxComponent {
 	}
 
 	void Component::mouseDragged(ofMouseEventArgs &mouse) {
+		if (!isActive) return;
+
 		if (dragging) {
 			ofVec2f move = getMousePos() - getPreviousMousePos();
 			setPos(getPos() + move);
@@ -95,6 +115,8 @@ namespace ofxComponent {
 	}
 
 	void Component::mouseReleased(ofMouseEventArgs &mouse) {
+		if (!isActive) return;
+
 		if (dragging) dragging = false;
 
 		onMouseReleased(mouse);

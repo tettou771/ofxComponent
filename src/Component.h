@@ -22,6 +22,11 @@ namespace ofxComponent {
 		void exit(ofEventArgs &);
 		virtual void onExit() {}
 
+		// acitive / disactive
+		void setActive(bool);
+		bool getActive() { return isActive; }
+		virtual void onActiveChanged() { ; }
+
 		// key
 		void keyPressed(ofKeyEventArgs &);
 		virtual void onKeyPressed(ofKeyEventArgs &) {}
@@ -83,6 +88,7 @@ namespace ofxComponent {
 		void removeChild(Component *_child);
 
 	private:
+		bool isActive = true;
 		ofRectangle rect;
 		float scale = 1.0;
 		float rotation = 0;
