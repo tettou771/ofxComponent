@@ -51,8 +51,9 @@ namespace ofxComponent {
 		virtual void onDragEvent(ofDragInfo &) {}
 
 		ofRectangle getRect();
-		ofRectangle getRectGlobal();
+		ofRectangle getGlobalRect();
 		ofVec2f getPos();
+		ofVec2f getGlobalPos();
 		float getParentWidth();
 		float getParentHeight();
 		float getWidth();
@@ -61,7 +62,9 @@ namespace ofxComponent {
 		float getRotation();
 		void setRect(ofRectangle);
 		void setPos(float, float);
-		void setPos(ofVec2f _pos);
+		void setPos(ofVec2f);
+		void setCenterPos(float, float);
+		void setCenterPos(ofVec2f);
 		void setWidth(float);
 		void setHeight(float);
 		void setScale(float);
@@ -92,6 +95,7 @@ namespace ofxComponent {
 
 		// component getter
 		Component * getParent() { return parent; }
+		vector<Component *> getChildren() { return children; }
 		Component * getChild(int i);
 
 	private:

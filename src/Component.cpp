@@ -90,7 +90,7 @@ namespace ofxComponent {
 	void Component::mousePressed(ofMouseEventArgs &mouse) {
 		if (!isActive) return;
 
-		if (draggable && getRectGlobal().inside(ofGetMouseX(), ofGetMouseY())) {
+		if (draggable && getGlobalRect().inside(ofGetMouseX(), ofGetMouseY())) {
 			dragging = true;
 		}
 
@@ -137,12 +137,12 @@ namespace ofxComponent {
 		return rect;
 	}
 
-	ofRectangle Component::getRectGlobal() {
+	ofRectangle Component::getGlobalRect() {
 		if (parent == nullptr) {
 			return rect;
 		}
 		else {
-			ofRectangle pRect = parent->getRectGlobal();
+			ofRectangle pRect = parent->getGlobalRect();
 			ofRectangle globalRect;
 			globalRect.x = rect.x + pRect.x;
 			globalRect.y = rect.y + pRect.y;
@@ -154,6 +154,10 @@ namespace ofxComponent {
 
 	ofVec2f Component::getPos() {
 		return ofVec2f(rect.x, rect.y);
+	}
+
+	ofVec2f Component::getGlobalPos() {
+		return localToGlobalPos(getPos());
 	}
 
 	float Component::getParentWidth() {
@@ -201,6 +205,14 @@ namespace ofxComponent {
 
 	void Component::setPos(ofVec2f _pos) {
 		setPos(_pos.x, _pos.y);
+	}
+
+	void Component::setCenterPos(float x, float y) {
+		setRect(ofRectangle(x - rect.width / 2, y - rect.height / 2, rect.width, rect.height));
+	}
+
+	void Component::setCenterPos(ofVec2f pos) {
+		setCenterPos(pos.x, pos.y);
 	}
 
 	void Component::setWidth(float _width) {
