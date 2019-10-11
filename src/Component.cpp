@@ -7,11 +7,17 @@ namespace ofxComponent {
 
 
 	Component::~Component() {
+		/*
+		if (parent != nullptr) {
+			parent->removeChild(this);
+		}
+		*/
 	}
 
 	void Component::setup() {
 		onSetup();
-		for (auto &c : children) {
+		for (int i = 0; i < children.size(); ++i) {
+			auto &c = children[i];
 			c->setup();
 		}
 	}
@@ -20,7 +26,8 @@ namespace ofxComponent {
 		if (!isActive) return;
 
 		onUpdate();
-		for (auto &c : children) {
+		for (int i = 0; i < children.size(); ++i) {
+			auto &c = children[i];
 			c->update(args);
 		}
 		postUpdate();
@@ -36,7 +43,8 @@ namespace ofxComponent {
 		onDraw();
 		ofPopStyle();
 
-		for (auto &c : children) {
+		for (int i = 0; i < children.size(); ++i) {
+			auto &c = children[i];
 			c->draw(args);
 		}
 
@@ -49,7 +57,8 @@ namespace ofxComponent {
 
 	void Component::exit(ofEventArgs &args) {
 		onExit();
-		for (auto &c : children) {
+		for (int i = 0; i < children.size(); ++i) {
+			auto &c = children[i];
 			c->exit(args);
 		}
 	}
@@ -64,7 +73,8 @@ namespace ofxComponent {
 		if (!isActive) return;
 
 		onKeyPressed(key);
-		for (auto &c : children) {
+		for (int i = 0; i < children.size(); ++i) {
+			auto &c = children[i];
 			c->keyPressed(key);
 		}
 	}
@@ -73,7 +83,8 @@ namespace ofxComponent {
 		if (!isActive) return;
 
 		onKeyReleased(key);
-		for (auto &c : children) {
+		for (int i = 0; i < children.size(); ++i) {
+			auto &c = children[i];
 			c->keyReleased(key);
 		}
 	}
@@ -82,7 +93,8 @@ namespace ofxComponent {
 		if (!isActive) return;
 
 		onMouseMoved(mouse);
-		for (auto &c : children) {
+		for (int i = 0; i < children.size(); ++i) {
+			auto &c = children[i];
 			c->mouseMoved(mouse);
 		}
 	}
@@ -95,7 +107,8 @@ namespace ofxComponent {
 		}
 
 		onMousePressed(mouse);
-		for (auto &c : children) {
+		for (int i = 0; i < children.size(); ++i) {
+			auto &c = children[i];
 			c->mousePressed(mouse);
 		}
 	}
@@ -120,7 +133,8 @@ namespace ofxComponent {
 		if (dragging) dragging = false;
 
 		onMouseReleased(mouse);
-		for (auto &c : children) {
+		for (int i = 0; i < children.size(); ++i) {
+			auto &c = children[i];
 			c->mouseReleased(mouse);
 		}
 	}
@@ -128,7 +142,8 @@ namespace ofxComponent {
 	void Component::dragEvent(ofDragInfo &dragInfo) {
 		onDragEvent(dragInfo);
 
-		for (auto &c : children) {
+		for (int i = 0; i < children.size(); ++i) {
+			auto &c = children[i];
 			c->dragEvent(dragInfo);
 		}
 	}
@@ -287,11 +302,24 @@ namespace ofxComponent {
 	}
 
 	void Component::setParent(Component * _parent) {
+		if (parent == _parent) return;
+
+		if (parent != nullptr) {
+			parent->removeChild(this);
+		}
+
 		parent = _parent;
+
+		if (parent != nullptr) {
+			parent->addChild(this);
+		}
 	}
 
 	void Component::removeParent() {
-		parent = nullptr;
+		if (parent != nullptr) {
+			parent->removeChild(this);
+			parent = nullptr;
+		}
 	}
 
 	void Component::addChild(Component * _child) {

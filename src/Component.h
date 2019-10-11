@@ -11,13 +11,13 @@ namespace ofxComponent {
 		void setup();
 		virtual void onSetup() {}
 
-		void draw(ofEventArgs &);
-		virtual void onDraw() {}
-		virtual void postDraw() {}
-
 		void update(ofEventArgs &);
 		virtual void onUpdate() {}
 		virtual void postUpdate() {}
+
+		void draw(ofEventArgs &);
+		virtual void onDraw() {}
+		virtual void postDraw() {}
 
 		void exit(ofEventArgs &);
 		virtual void onExit() {}
