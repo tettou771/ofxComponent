@@ -7,11 +7,6 @@ namespace ofxComponent {
 
 
 	Component::~Component() {
-		/*
-		if (parent != nullptr) {
-			parent->removeChild(this);
-		}
-		*/
 	}
 
 	void Component::setup() {
@@ -205,8 +200,19 @@ namespace ofxComponent {
 		return scale;
 	}
 
+	float Component::getGlobalScale() {
+		auto scaleVec = globalMatrix.getScale();
+		return scaleVec.x;
+	}
+
 	float Component::getRotation() {
 		return rotation;
+	}
+
+	float Component::getGlobalRotation() {
+		auto quaternion = globalMatrix.getRotate();
+		auto rotationVec = quaternion.getEuler();
+		return rotationVec.z;
 	}
 
 	void Component::setRect(ofRectangle _rect) {
@@ -220,6 +226,14 @@ namespace ofxComponent {
 
 	void Component::setPos(ofVec2f _pos) {
 		setPos(_pos.x, _pos.y);
+	}
+
+	void Component::setGlobalPos(float x, float y) {
+		setGlobalPos(ofVec2f(x, y));
+	}
+
+	void Component::setGlobalPos(ofVec2f _gPos) {
+		setPos(globalToLocalPos(_gPos));
 	}
 
 	void Component::setCenterPos(float x, float y) {
@@ -247,7 +261,7 @@ namespace ofxComponent {
 		rotation = _rotation;
 		updateMatrix();
 	}
-	
+
 	ofVec2f Component::globalToLocalPos(ofVec2f _globalPos) {
 		return globalMatrixInverse.preMult(ofVec3f(_globalPos));
 	}
@@ -359,8 +373,8 @@ namespace ofxComponent {
 		for (int i = 0; i < children.size(); ++i) {
 			auto c = children[i];
 			if (c == _child) {
+				_child->parent = nullptr;
 				children.erase(children.begin() + i);
-				_child->removeParent();
 				break;
 			}
 		}

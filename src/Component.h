@@ -5,7 +5,7 @@ namespace ofxComponent {
 	class Component {
 	public:
 		Component();
-		~Component();
+		virtual ~Component();
 
 		// of events
 		void setup();
@@ -59,16 +59,22 @@ namespace ofxComponent {
 		float getWidth();
 		float getHeight();
 		float getScale();
+		float getGlobalScale();
 		float getRotation();
+		float getGlobalRotation();
 		void setRect(ofRectangle);
 		void setPos(float, float);
 		void setPos(ofVec2f);
+		void setGlobalPos(float, float);
+		void setGlobalPos(ofVec2f);
 		void setCenterPos(float, float);
 		void setCenterPos(ofVec2f);
 		void setWidth(float);
 		void setHeight(float);
 		void setScale(float);
+		// setGlobalScale(float); // todo
 		void setRotation(float);
+		// setGlobalRotation(float); // todo
 
 		// convert coordinated position
 		ofVec2f globalToLocalPos(ofVec2f _globalPos);
