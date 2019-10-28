@@ -2,7 +2,7 @@
 #include "ofMain.h"
 
 namespace ofxComponent {
-	class Component {
+	class Component : public enable_shared_from_this<Component> {
 	public:
 		Component();
 		virtual ~Component();
@@ -93,16 +93,16 @@ namespace ofxComponent {
 		bool getDraggable();
 		bool getDragging();
 
-		void setParent(Component *_parent);
+		void setParent(shared_ptr<Component> _parent);
 		void removeParent();
-		void addChild(Component *_child);
-		void insertChild(Component *_child, int index);
-		void removeChild(Component *_child);
+		void addChild(shared_ptr<Component> _child);
+		void insertChild(shared_ptr<Component> _child, int index);
+		void removeChild(shared_ptr<Component> _child);
 
 		// component getter
-		Component * getParent() { return parent; }
-		vector<Component *> getChildren() { return children; }
-		Component * getChild(int i);
+		shared_ptr<Component> getParent() { return parent; }
+		vector<shared_ptr<Component>> getChildren() { return children; }
+		shared_ptr<Component> getChild(int i);
 
 	private:
 		bool isActive = true;
@@ -115,7 +115,7 @@ namespace ofxComponent {
 
 		bool draggable = false, dragging = false;
 
-		Component * parent = nullptr;
-		vector<Component *> children;
+		shared_ptr<Component> parent = nullptr;
+		vector<shared_ptr<Component>> children;
 	};
 }

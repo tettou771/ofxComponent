@@ -315,33 +315,33 @@ namespace ofxComponent {
 		return dragging;
 	}
 
-	void Component::setParent(Component * _parent) {
+	void Component::setParent(shared_ptr<Component>  _parent) {
 		if (parent == _parent) return;
 
 		if (parent != nullptr) {
-			parent->removeChild(this);
+			parent->removeChild(shared_from_this());
 		}
 
 		parent = _parent;
 
 		if (parent != nullptr) {
-			parent->addChild(this);
+			parent->addChild(shared_from_this());
 		}
 	}
 
 	void Component::removeParent() {
 		if (parent != nullptr) {
-			parent->removeChild(this);
+			parent->removeChild(shared_from_this());
 			parent = nullptr;
 		}
 	}
 
-	void Component::addChild(Component * _child) {
+	void Component::addChild(shared_ptr<Component>  _child) {
 		// insert to back
 		insertChild(_child, children.size());
 	}
 
-	void Component::insertChild(Component * _child, int index) {
+	void Component::insertChild(shared_ptr<Component>  _child, int index) {
 		bool alreadyListed = false;
 
 		for (auto &c : children) {
@@ -365,11 +365,11 @@ namespace ofxComponent {
 				children.insert(children.begin(), _child);
 			}
 
-			_child->setParent(this);
+			_child->setParent(shared_from_this());
 		}
 	}
 
-	void Component::removeChild(Component * _child) {
+	void Component::removeChild(shared_ptr<Component>  _child) {
 		for (int i = 0; i < children.size(); ++i) {
 			auto c = children[i];
 			if (c == _child) {
@@ -380,7 +380,7 @@ namespace ofxComponent {
 		}
 	}
 	
-	Component * Component::getChild(int i) {
+	shared_ptr<Component>  Component::getChild(int i) {
 		if (i < 0 || children.size() <= i) {
 			return nullptr;
 		}
