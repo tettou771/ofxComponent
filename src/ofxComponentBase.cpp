@@ -1,15 +1,15 @@
-#include "Component.h"
+#include "ofxComponentBase.h"
 
 namespace ofxComponent {
 
-	Component::Component() {
+	ofxComponentBase::ofxComponentBase() {
 	}
 
 
-	Component::~Component() {
+	ofxComponentBase::~ofxComponentBase() {
 	}
 
-	void Component::setup() {
+	void ofxComponentBase::setup() {
 		onSetup();
 		for (int i = 0; i < children.size(); ++i) {
 			auto &c = children[i];
@@ -17,7 +17,7 @@ namespace ofxComponent {
 		}
 	}
 
-	void Component::update(ofEventArgs &args) {
+	void ofxComponentBase::update(ofEventArgs &args) {
 		if (!isActive) return;
 
 		onUpdate();
@@ -28,7 +28,7 @@ namespace ofxComponent {
 		postUpdate();
 	}
 
-	void Component::draw(ofEventArgs &args) {
+	void ofxComponentBase::draw(ofEventArgs &args) {
 		if (!isActive) return;
 
 		ofPushMatrix();
@@ -50,7 +50,7 @@ namespace ofxComponent {
 		ofPopMatrix();
 	}
 
-	void Component::exit(ofEventArgs &args) {
+	void ofxComponentBase::exit(ofEventArgs &args) {
 		onExit();
 		for (int i = 0; i < children.size(); ++i) {
 			auto &c = children[i];
@@ -58,13 +58,13 @@ namespace ofxComponent {
 		}
 	}
 
-	void Component::setActive(bool active) {
+	void ofxComponentBase::setActive(bool active) {
 		if (isActive == active) return;
 		isActive = active;
 		onActiveChanged();
 	}
 
-	void Component::keyPressed(ofKeyEventArgs &key) {
+	void ofxComponentBase::keyPressed(ofKeyEventArgs &key) {
 		if (!isActive) return;
 
 		onKeyPressed(key);
@@ -74,7 +74,7 @@ namespace ofxComponent {
 		}
 	}
 
-	void Component::keyReleased(ofKeyEventArgs &key) {
+	void ofxComponentBase::keyReleased(ofKeyEventArgs &key) {
 		if (!isActive) return;
 
 		onKeyReleased(key);
@@ -84,7 +84,7 @@ namespace ofxComponent {
 		}
 	}
 
-	void Component::mouseMoved(ofMouseEventArgs &mouse) {
+	void ofxComponentBase::mouseMoved(ofMouseEventArgs &mouse) {
 		if (!isActive) return;
 
 		onMouseMoved(mouse);
@@ -94,7 +94,7 @@ namespace ofxComponent {
 		}
 	}
 
-	void Component::mousePressed(ofMouseEventArgs &mouse) {
+	void ofxComponentBase::mousePressed(ofMouseEventArgs &mouse) {
 		if (!isActive) return;
 
 		if (draggable && getGlobalRect().inside(ofGetMouseX(), ofGetMouseY())) {
@@ -108,7 +108,7 @@ namespace ofxComponent {
 		}
 	}
 
-	void Component::mouseDragged(ofMouseEventArgs &mouse) {
+	void ofxComponentBase::mouseDragged(ofMouseEventArgs &mouse) {
 		if (!isActive) return;
 
 		if (dragging) {
@@ -122,7 +122,7 @@ namespace ofxComponent {
 		}
 	}
 
-	void Component::mouseReleased(ofMouseEventArgs &mouse) {
+	void ofxComponentBase::mouseReleased(ofMouseEventArgs &mouse) {
 		if (!isActive) return;
 
 		if (dragging) dragging = false;
@@ -134,7 +134,7 @@ namespace ofxComponent {
 		}
 	}
 
-	void Component::dragEvent(ofDragInfo &dragInfo) {
+	void ofxComponentBase::dragEvent(ofDragInfo &dragInfo) {
 		onDragEvent(dragInfo);
 
 		for (int i = 0; i < children.size(); ++i) {
@@ -143,11 +143,11 @@ namespace ofxComponent {
 		}
 	}
 
-	ofRectangle Component::getRect() {
+	ofRectangle ofxComponentBase::getRect() {
 		return rect;
 	}
 
-	ofRectangle Component::getGlobalRect() {
+	ofRectangle ofxComponentBase::getGlobalRect() {
 		if (parent == nullptr) {
 			return rect;
 		}
@@ -162,15 +162,15 @@ namespace ofxComponent {
 		}
 	}
 
-	ofVec2f Component::getPos() {
+	ofVec2f ofxComponentBase::getPos() {
 		return ofVec2f(rect.x, rect.y);
 	}
 
-	ofVec2f Component::getGlobalPos() {
+	ofVec2f ofxComponentBase::getGlobalPos() {
 		return localToGlobalPos(getPos());
 	}
 
-	float Component::getParentWidth() {
+	float ofxComponentBase::getParentWidth() {
 		if (parent == nullptr) {
 			return ofGetWidth();
 		}
@@ -179,7 +179,7 @@ namespace ofxComponent {
 		}
 	}
 
-	float Component::getParentHeight() {
+	float ofxComponentBase::getParentHeight() {
 		if (parent == nullptr) {
 			return ofGetHeight();
 		}
@@ -188,134 +188,134 @@ namespace ofxComponent {
 		}
 	}
 
-	float Component::getWidth() {
+	float ofxComponentBase::getWidth() {
 		return rect.width;
 	}
 
-	float Component::getHeight() {
+	float ofxComponentBase::getHeight() {
 		return rect.height;
 	}
 
-	float Component::getScale() {
+	float ofxComponentBase::getScale() {
 		return scale;
 	}
 
-	float Component::getGlobalScale() {
+	float ofxComponentBase::getGlobalScale() {
 		auto scaleVec = globalMatrix.getScale();
 		return scaleVec.x;
 	}
 
-	float Component::getRotation() {
+	float ofxComponentBase::getRotation() {
 		return rotation;
 	}
 
-	float Component::getGlobalRotation() {
+	float ofxComponentBase::getGlobalRotation() {
 		auto quaternion = globalMatrix.getRotate();
 		auto rotationVec = quaternion.getEuler();
 		return rotationVec.z;
 	}
 
-	void Component::setRect(ofRectangle _rect) {
+	void ofxComponentBase::setRect(ofRectangle _rect) {
 		rect = _rect;
 		updateMatrix();
 	}
 
-	void Component::setPos(float x, float y) {
+	void ofxComponentBase::setPos(float x, float y) {
 		setRect(ofRectangle(x, y, rect.width, rect.height));
 	}
 
-	void Component::setPos(ofVec2f _pos) {
+	void ofxComponentBase::setPos(ofVec2f _pos) {
 		setPos(_pos.x, _pos.y);
 	}
 
-	void Component::setGlobalPos(float x, float y) {
+	void ofxComponentBase::setGlobalPos(float x, float y) {
 		setGlobalPos(ofVec2f(x, y));
 	}
 
-	void Component::setGlobalPos(ofVec2f _gPos) {
+	void ofxComponentBase::setGlobalPos(ofVec2f _gPos) {
 		setPos(globalToLocalPos(_gPos));
 	}
 
-	void Component::setCenterPos(float x, float y) {
+	void ofxComponentBase::setCenterPos(float x, float y) {
 		setRect(ofRectangle(x - rect.width / 2, y - rect.height / 2, rect.width, rect.height));
 	}
 
-	void Component::setCenterPos(ofVec2f pos) {
+	void ofxComponentBase::setCenterPos(ofVec2f pos) {
 		setCenterPos(pos.x, pos.y);
 	}
 
-	void Component::setWidth(float _width) {
+	void ofxComponentBase::setWidth(float _width) {
 		setRect(ofRectangle(rect.x, rect.y, _width, rect.height));
 	}
 
-	void Component::setHeight(float _height) {
+	void ofxComponentBase::setHeight(float _height) {
 		setRect(ofRectangle(rect.x, rect.y, rect.width, _height));
 	}
 
-	void Component::setScale(float _scale) {
+	void ofxComponentBase::setScale(float _scale) {
 		scale = _scale;
 		updateMatrix();
 	}
 
-	void Component::setRotation(float _rotation) {
+	void ofxComponentBase::setRotation(float _rotation) {
 		rotation = _rotation;
 		updateMatrix();
 	}
 
-	ofVec2f Component::globalToLocalPos(ofVec2f _globalPos) {
+	ofVec2f ofxComponentBase::globalToLocalPos(ofVec2f _globalPos) {
 		return globalMatrixInverse.preMult(ofVec3f(_globalPos));
 	}
 
-	ofVec2f Component::localToGlobalPos(ofVec2f _localPos) {
+	ofVec2f ofxComponentBase::localToGlobalPos(ofVec2f _localPos) {
 		return globalMatrix.preMult(ofVec3f(_localPos));
 	}
 
-	float Component::getMouseX() {
+	float ofxComponentBase::getMouseX() {
 		return getMousePos().x;
 	}
 
-	float Component::getMouseY() {
+	float ofxComponentBase::getMouseY() {
 		return getMousePos().y;
 	}
 
-	ofVec2f Component::getMousePos() {
+	ofVec2f ofxComponentBase::getMousePos() {
 		return globalToLocalPos(ofVec2f(ofGetMouseX(), ofGetMouseY()));
 	}
 
-	ofVec2f Component::getPreviousMousePos() {
+	ofVec2f ofxComponentBase::getPreviousMousePos() {
 		return globalToLocalPos(ofVec2f(ofGetPreviousMouseX(), ofGetPreviousMouseY()));
 	}
 
-	ofMatrix4x4 Component::getLocalMatrix() {
+	ofMatrix4x4 ofxComponentBase::getLocalMatrix() {
 		return localMatrix;
 	}
 
-	ofMatrix4x4 Component::getLocalMatrixInverse() {
+	ofMatrix4x4 ofxComponentBase::getLocalMatrixInverse() {
 		return localMatrixInverse;
 	}
 
-	ofMatrix4x4 Component::getGlobalMatrix() {
+	ofMatrix4x4 ofxComponentBase::getGlobalMatrix() {
 		return globalMatrix;
 	}
 
-	ofMatrix4x4 Component::getGlobalMatrixInverse() {
+	ofMatrix4x4 ofxComponentBase::getGlobalMatrixInverse() {
 		return globalMatrixInverse;
 	}
 
-	void Component::setDraggable(bool _draggable) {
+	void ofxComponentBase::setDraggable(bool _draggable) {
 		draggable = _draggable;
 		if (!draggable) dragging = false;
 	}
 
-	bool Component::getDraggable() {
+	bool ofxComponentBase::getDraggable() {
 		return draggable;
 	}
 
-	bool Component::getDragging() {
+	bool ofxComponentBase::getDragging() {
 		return dragging;
 	}
 
-	void Component::setParent(shared_ptr<Component>  _parent) {
+	void ofxComponentBase::setParent(shared_ptr<ofxComponentBase>  _parent) {
 		if (parent == _parent) return;
 
 		if (parent != nullptr) {
@@ -329,19 +329,19 @@ namespace ofxComponent {
 		}
 	}
 
-	void Component::removeParent() {
+	void ofxComponentBase::removeParent() {
 		if (parent != nullptr) {
 			parent->removeChild(shared_from_this());
 			parent = nullptr;
 		}
 	}
 
-	void Component::addChild(shared_ptr<Component>  _child) {
+	void ofxComponentBase::addChild(shared_ptr<ofxComponentBase>  _child) {
 		// insert to back
 		insertChild(_child, children.size());
 	}
 
-	void Component::insertChild(shared_ptr<Component>  _child, int index) {
+	void ofxComponentBase::insertChild(shared_ptr<ofxComponentBase>  _child, int index) {
 		bool alreadyListed = false;
 
 		for (auto &c : children) {
@@ -369,7 +369,7 @@ namespace ofxComponent {
 		}
 	}
 
-	void Component::removeChild(shared_ptr<Component>  _child) {
+	void ofxComponentBase::removeChild(shared_ptr<ofxComponentBase>  _child) {
 		for (int i = 0; i < children.size(); ++i) {
 			auto c = children[i];
 			if (c == _child) {
@@ -380,14 +380,14 @@ namespace ofxComponent {
 		}
 	}
 	
-	shared_ptr<Component>  Component::getChild(int i) {
+	shared_ptr<ofxComponentBase>  ofxComponentBase::getChild(int i) {
 		if (i < 0 || children.size() <= i) {
 			return nullptr;
 		}
 		return children[i];
 	}
 
-	void Component::updateMatrix() {
+	void ofxComponentBase::updateMatrix() {
 		/*
 		localMatrix.translate(ofVec3f(rect.x - rect.width / 2, rect.y - rect.height / 2, 0));
 		localMatrix.rotateRad(rotation * DEG_TO_RAD, 0, 0, 1);
@@ -408,7 +408,7 @@ namespace ofxComponent {
 		updateGlobalMatrix();
 	}
 
-	void Component::updateGlobalMatrix() {
+	void ofxComponentBase::updateGlobalMatrix() {
 		// make global
 		if (parent == nullptr) {
 			globalMatrix = localMatrix;

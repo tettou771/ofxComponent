@@ -7,7 +7,7 @@ void ofApp::setup(){
 	ofSetBackgroundAuto(true);
 
 	// Set drawing area
-	manager = make_shared<ComponentManager>();
+	manager = make_shared<ofxComponentManager>();
 	manager->setRect(ofRectangle(0, 0, ofGetWidth(), ofGetHeight()));
 
 	/*

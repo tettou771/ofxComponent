@@ -2,10 +2,10 @@
 #include "ofMain.h"
 
 namespace ofxComponent {
-	class Component : public enable_shared_from_this<Component> {
+	class ofxComponentBase : public enable_shared_from_this<ofxComponentBase> {
 	public:
-		Component();
-		virtual ~Component();
+		ofxComponentBase();
+		virtual ~ofxComponentBase();
 
 		// of events
 		void setup();
@@ -93,16 +93,16 @@ namespace ofxComponent {
 		bool getDraggable();
 		bool getDragging();
 
-		void setParent(shared_ptr<Component> _parent);
+		void setParent(shared_ptr<ofxComponentBase> _parent);
 		void removeParent();
-		void addChild(shared_ptr<Component> _child);
-		void insertChild(shared_ptr<Component> _child, int index);
-		void removeChild(shared_ptr<Component> _child);
+		void addChild(shared_ptr<ofxComponentBase> _child);
+		void insertChild(shared_ptr<ofxComponentBase> _child, int index);
+		void removeChild(shared_ptr<ofxComponentBase> _child);
 
 		// component getter
-		shared_ptr<Component> getParent() { return parent; }
-		vector<shared_ptr<Component>> getChildren() { return children; }
-		shared_ptr<Component> getChild(int i);
+		shared_ptr<ofxComponentBase> getParent() { return parent; }
+		vector<shared_ptr<ofxComponentBase>> getChildren() { return children; }
+		shared_ptr<ofxComponentBase> getChild(int i);
 
 	private:
 		bool isActive = true;
@@ -115,7 +115,7 @@ namespace ofxComponent {
 
 		bool draggable = false, dragging = false;
 
-		shared_ptr<Component> parent = nullptr;
-		vector<shared_ptr<Component>> children;
+		shared_ptr<ofxComponentBase> parent = nullptr;
+		vector<shared_ptr<ofxComponentBase>> children;
 	};
 }

@@ -1,11 +1,11 @@
 #pragma once
-#include "Component.h"
+#include "ofxComponentBase.h"
 
 namespace ofxComponent {
-	class ComponentManager : public Component {
+	class ofxComponentManager : public ofxComponentBase {
 	public:
-		ComponentManager();
-		~ComponentManager();
+		ofxComponentManager();
+		~ofxComponentManager();
 
 		void onSetup();
 		void update(ofEventArgs &);

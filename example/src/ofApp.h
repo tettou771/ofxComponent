@@ -6,7 +6,7 @@
 using namespace ofxComponent;
 
 // position coordinate demo
-class YellowComponent : public Component {
+class YellowComponent : public ofxComponentBase {
 	void onSetup() override {
 		setRect(ofRectangle(50, 100, 300, 200));
 		setRotation(30);
@@ -34,7 +34,7 @@ class YellowComponent : public Component {
 };
 
 // drag demo
-class BlueComponent : public Component {
+class BlueComponent : public ofxComponentBase {
 	void onSetup() override {
 		setDraggable(true);
 		setRect(ofRectangle(20, 20, 60, 60));
@@ -55,7 +55,7 @@ class BlueComponent : public Component {
 };
 
 // parent compornent demo
-class RedComponent : public Component {
+class RedComponent : public ofxComponentBase {
 	void onSetup() override {
 		yellowInRed = make_shared<YellowComponent>();
 		addChild(yellowInRed);
@@ -111,7 +111,7 @@ public:
 	void dragEvent(ofDragInfo dragInfo);
 	void gotMessage(ofMessage msg);
 
-	shared_ptr<ComponentManager> manager;
+	shared_ptr<ofxComponentManager> manager;
 	shared_ptr<RedComponent> red;
 	shared_ptr<YellowComponent> yellow;
 	shared_ptr<BlueComponent> blue;

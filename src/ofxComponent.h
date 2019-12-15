@@ -1,4 +1,4 @@
 #pragma once
 
-#include "Component.h"
-#include "ComponentManager.h"
+#include "ofxComponentBase.h"
+#include "ofxComponentManager.h"
