@@ -7,7 +7,8 @@ void ofApp::setup(){
 	ofSetBackgroundAuto(true);
 
 	// Set drawing area
-	manager.setRect(ofRectangle(0, 0, ofGetWidth(), ofGetHeight()));
+	manager = make_shared<ComponentManager>();
+	manager->setRect(ofRectangle(0, 0, ofGetWidth(), ofGetHeight()));
 
 	/*
 	// Set pos, width, height
@@ -17,17 +18,21 @@ void ofApp::setup(){
 	manager.setHeight(ofGetHeight());
 	*/
 
-	red.setRect(ofRectangle(500, 100, 400, 400));
+	// make shared pointer instance
+	red = make_shared<RedComponent>();
+	red->setRect(ofRectangle(500, 100, 400, 400)); // set position and size if needed
+	yellow = make_shared<YellowComponent>();
+	blue = make_shared<BlueComponent>();
 
 	// Add children
 	// draw() and update() etc... is sorted by this order
-	manager.addChild(&red);
-	manager.addChild(&yellow);
-	manager.addChild(&blue);
+	manager->addChild(red);
+	manager->addChild(yellow);
+	manager->addChild(blue);
 
 	// Setup all objects
 	// Please call this after children add
-	manager.setup();
+	manager->setup();
 }
 
 //--------------------------------------------------------------

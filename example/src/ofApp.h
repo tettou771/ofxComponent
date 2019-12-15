@@ -57,8 +57,10 @@ class BlueComponent : public Component {
 // parent compornent demo
 class RedComponent : public Component {
 	void onSetup() override {
-		addChild(&yellowInRed);
-		addChild(&blueInRed);
+		yellowInRed = make_shared<YellowComponent>();
+		addChild(yellowInRed);
+		blueInRed = make_shared<BlueComponent>();
+		addChild(blueInRed);
 	}
 	void onUpdate() override {
 		ofLog() << "RedComponent onUpdate()";
@@ -86,8 +88,8 @@ class RedComponent : public Component {
 	}
 
 private:
-	YellowComponent yellowInRed;
-	BlueComponent blueInRed;
+	shared_ptr<YellowComponent> yellowInRed;
+	shared_ptr<BlueComponent> blueInRed;
 };
 
 class ofApp : public ofBaseApp {
@@ -109,8 +111,8 @@ public:
 	void dragEvent(ofDragInfo dragInfo);
 	void gotMessage(ofMessage msg);
 
-	ComponentManager manager;
-	RedComponent red;
-	YellowComponent yellow;
-	BlueComponent blue;
+	shared_ptr<ComponentManager> manager;
+	shared_ptr<RedComponent> red;
+	shared_ptr<YellowComponent> yellow;
+	shared_ptr<BlueComponent> blue;
 };
