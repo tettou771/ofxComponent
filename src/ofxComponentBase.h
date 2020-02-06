@@ -2,6 +2,11 @@
 #include "ofMain.h"
 
 namespace ofxComponent {
+	enum Alignment {
+		Cornar,
+		Center
+	};
+
 	class ofxComponentBase : public enable_shared_from_this<ofxComponentBase> {
 	public:
 		ofxComponentBase();
@@ -11,49 +16,59 @@ namespace ofxComponent {
 		void setup();
 		virtual void onSetup() {}
 
-		void update(ofEventArgs &);
+		void update(ofEventArgs&);
 		virtual void onUpdate() {}
 		virtual void postUpdate() {}
 
-		void draw(ofEventArgs &);
+		void draw(ofEventArgs&);
 		virtual void onDraw() {}
 		virtual void postDraw() {}
 
-		void exit(ofEventArgs &);
+		void exit(ofEventArgs&);
 		virtual void onExit() {}
 
 		// acitive / disactive
 		void setActive(bool);
 		bool getActive() { return isActive; }
-		virtual void onActiveChanged() { ; }
+		virtual void onActiveChanged(bool active) { ; }
+
+		// global active
+		bool getGlobalActive();
+		virtual void onGlobalActiveChanged(bool active) { ; }
 
 		// key
-		void keyPressed(ofKeyEventArgs &);
-		virtual void onKeyPressed(ofKeyEventArgs &) {}
+		void keyPressed(ofKeyEventArgs&);
+		virtual void onKeyPressed(ofKeyEventArgs&) {}
 
-		void keyReleased(ofKeyEventArgs &);
-		virtual void onKeyReleased(ofKeyEventArgs &) {}
+		void keyReleased(ofKeyEventArgs&);
+		virtual void onKeyReleased(ofKeyEventArgs&) {}
 
 		// mouse
-		void mouseMoved(ofMouseEventArgs &);
-		virtual void onMouseMoved(ofMouseEventArgs &) {}
+		void mouseMoved(ofMouseEventArgs&);
+		virtual void onMouseMoved(ofMouseEventArgs&) {}
 
-		void mousePressed(ofMouseEventArgs &);
-		virtual void onMousePressed(ofMouseEventArgs &) {}
+		void mousePressed(ofMouseEventArgs&);
+		virtual void onMousePressed(ofMouseEventArgs&) {}
 
-		void mouseDragged(ofMouseEventArgs &);
-		virtual void onMouseDragged(ofMouseEventArgs &) {}
+		void mouseDragged(ofMouseEventArgs&);
+		virtual void onMouseDragged(ofMouseEventArgs&) {}
 
-		void mouseReleased(ofMouseEventArgs &);
-		virtual void onMouseReleased(ofMouseEventArgs &) {}
+		void mouseReleased(ofMouseEventArgs&);
+		virtual void onMouseReleased(ofMouseEventArgs&) {}
 
-		void dragEvent(ofDragInfo &);
-		virtual void onDragEvent(ofDragInfo &) {}
+		void mouseScrolled(ofMouseEventArgs&);
+		virtual void onMouseScrolled(ofMouseEventArgs&) {};
+
+		void dragEvent(ofDragInfo&);
+		virtual void onDragEvent(ofDragInfo&) {}
+		
+		virtual void onLocalMatrixChanged() {};
 
 		ofRectangle getRect();
 		ofRectangle getGlobalRect();
 		ofVec2f getPos();
 		ofVec2f getGlobalPos();
+		Alignment getScaleAlignment();
 		float getParentWidth();
 		float getParentHeight();
 		float getWidth();
@@ -69,6 +84,7 @@ namespace ofxComponent {
 		void setGlobalPos(ofVec2f);
 		void setCenterPos(float, float);
 		void setCenterPos(ofVec2f);
+		void setScaleAlignment(Alignment);
 		void setWidth(float);
 		void setHeight(float);
 		void setScale(float);
@@ -108,10 +124,12 @@ namespace ofxComponent {
 		bool isActive = true;
 		ofRectangle rect;
 		float scale = 1.0;
+		Alignment scaleAlignment = Center;
 		float rotation = 0;
 		ofMatrix4x4 localMatrix, localMatrixInverse, globalMatrix, globalMatrixInverse;
 		void updateMatrix();
 		void updateGlobalMatrix();
+		void globalActiveChanged(bool _globalActive);
 
 		bool draggable = false, dragging = false;
 

@@ -17,6 +17,7 @@ namespace ofxComponent {
 		void mousePressed(ofMouseEventArgs &);
 		void mouseDragged(ofMouseEventArgs &);
 		void mouseReleased(ofMouseEventArgs &);
+		void mouseScrolled(ofMouseEventArgs &);
 		void dragEvent(ofDragInfo &);
 	};
 }

@@ -12,23 +12,23 @@ namespace ofxComponent {
 	void ofxComponentBase::setup() {
 		onSetup();
 		for (int i = 0; i < children.size(); ++i) {
-			auto &c = children[i];
+			auto& c = children[i];
 			c->setup();
 		}
 	}
 
-	void ofxComponentBase::update(ofEventArgs &args) {
+	void ofxComponentBase::update(ofEventArgs& args) {
 		if (!isActive) return;
 
 		onUpdate();
 		for (int i = 0; i < children.size(); ++i) {
-			auto &c = children[i];
+			auto& c = children[i];
 			c->update(args);
 		}
 		postUpdate();
 	}
 
-	void ofxComponentBase::draw(ofEventArgs &args) {
+	void ofxComponentBase::draw(ofEventArgs& args) {
 		if (!isActive) return;
 
 		ofPushMatrix();
@@ -39,7 +39,7 @@ namespace ofxComponent {
 		ofPopStyle();
 
 		for (int i = 0; i < children.size(); ++i) {
-			auto &c = children[i];
+			auto& c = children[i];
 			c->draw(args);
 		}
 
@@ -50,65 +50,96 @@ namespace ofxComponent {
 		ofPopMatrix();
 	}
 
-	void ofxComponentBase::exit(ofEventArgs &args) {
+	void ofxComponentBase::exit(ofEventArgs& args) {
 		onExit();
 		for (int i = 0; i < children.size(); ++i) {
-			auto &c = children[i];
+			auto& c = children[i];
 			c->exit(args);
 		}
 	}
 
 	void ofxComponentBase::setActive(bool active) {
 		if (isActive == active) return;
+		bool beforeGlobal = getGlobalActive();
 		isActive = active;
-		onActiveChanged();
+		onActiveChanged(active);
+		bool afterGlobal = getGlobalActive();
+
+		if (afterGlobal != beforeGlobal) {
+			globalActiveChanged(afterGlobal);
+		}
 	}
 
-	void ofxComponentBase::keyPressed(ofKeyEventArgs &key) {
+	void ofxComponentBase::globalActiveChanged(bool _globalActive) {
+		onGlobalActiveChanged(_globalActive);
+		for (int i = 0; i < children.size(); ++i) {
+			auto& c = children[i];
+			if (c->getActive()) {
+				c->globalActiveChanged(_globalActive);
+			}
+		}
+	}
+
+	bool ofxComponentBase::getGlobalActive() {
+		if (getActive()) {
+			auto p = getParent();
+			if (p) {
+				return p->getGlobalActive();
+			}
+			else {
+				return true;
+			}
+		}
+		else {
+			false;
+		}
+	}
+
+	void ofxComponentBase::keyPressed(ofKeyEventArgs& key) {
 		if (!isActive) return;
 
 		onKeyPressed(key);
 		for (int i = 0; i < children.size(); ++i) {
-			auto &c = children[i];
+			auto& c = children[i];
 			c->keyPressed(key);
 		}
 	}
 
-	void ofxComponentBase::keyReleased(ofKeyEventArgs &key) {
+	void ofxComponentBase::keyReleased(ofKeyEventArgs& key) {
 		if (!isActive) return;
 
 		onKeyReleased(key);
 		for (int i = 0; i < children.size(); ++i) {
-			auto &c = children[i];
+			auto& c = children[i];
 			c->keyReleased(key);
 		}
 	}
 
-	void ofxComponentBase::mouseMoved(ofMouseEventArgs &mouse) {
+	void ofxComponentBase::mouseMoved(ofMouseEventArgs& mouse) {
 		if (!isActive) return;
 
 		onMouseMoved(mouse);
 		for (int i = 0; i < children.size(); ++i) {
-			auto &c = children[i];
+			auto& c = children[i];
 			c->mouseMoved(mouse);
 		}
 	}
 
-	void ofxComponentBase::mousePressed(ofMouseEventArgs &mouse) {
+	void ofxComponentBase::mousePressed(ofMouseEventArgs& mouse) {
 		if (!isActive) return;
 
-		if (draggable && getGlobalRect().inside(ofGetMouseX(), ofGetMouseY())) {
+		if (draggable && ofRectangle(0, 0, rect.width, rect.height).inside(getMousePos())) {
 			dragging = true;
 		}
 
 		onMousePressed(mouse);
 		for (int i = 0; i < children.size(); ++i) {
-			auto &c = children[i];
+			auto& c = children[i];
 			c->mousePressed(mouse);
 		}
 	}
 
-	void ofxComponentBase::mouseDragged(ofMouseEventArgs &mouse) {
+	void ofxComponentBase::mouseDragged(ofMouseEventArgs& mouse) {
 		if (!isActive) return;
 
 		if (dragging) {
@@ -117,28 +148,38 @@ namespace ofxComponent {
 		}
 
 		onMouseDragged(mouse);
-		for (auto &c : children) {
+		for (auto& c : children) {
 			c->mouseDragged(mouse);
 		}
 	}
 
-	void ofxComponentBase::mouseReleased(ofMouseEventArgs &mouse) {
+	void ofxComponentBase::mouseReleased(ofMouseEventArgs& mouse) {
 		if (!isActive) return;
 
 		if (dragging) dragging = false;
 
 		onMouseReleased(mouse);
 		for (int i = 0; i < children.size(); ++i) {
-			auto &c = children[i];
+			auto& c = children[i];
 			c->mouseReleased(mouse);
 		}
 	}
 
-	void ofxComponentBase::dragEvent(ofDragInfo &dragInfo) {
+	void ofxComponentBase::mouseScrolled(ofMouseEventArgs& mouse) {
+		if (!isActive) return;
+
+		onMouseScrolled(mouse);
+		for (int i = 0; i < children.size(); ++i) {
+			auto& c = children[i];
+			c->mouseScrolled(mouse);
+		}
+	}
+
+	void ofxComponentBase::dragEvent(ofDragInfo& dragInfo) {
 		onDragEvent(dragInfo);
 
 		for (int i = 0; i < children.size(); ++i) {
-			auto &c = children[i];
+			auto& c = children[i];
 			c->dragEvent(dragInfo);
 		}
 	}
@@ -167,7 +208,11 @@ namespace ofxComponent {
 	}
 
 	ofVec2f ofxComponentBase::getGlobalPos() {
-		return localToGlobalPos(getPos());
+		return localToGlobalPos(ofVec2f());
+	}
+
+	Alignment ofxComponentBase::getScaleAlignment() {
+		return scaleAlignment;
 	}
 
 	float ofxComponentBase::getParentWidth() {
@@ -216,6 +261,7 @@ namespace ofxComponent {
 	}
 
 	void ofxComponentBase::setRect(ofRectangle _rect) {
+		if (rect == _rect) return;
 		rect = _rect;
 		updateMatrix();
 	}
@@ -244,6 +290,12 @@ namespace ofxComponent {
 		setCenterPos(pos.x, pos.y);
 	}
 
+	void ofxComponentBase::setScaleAlignment(Alignment _alignment) {
+		if (scaleAlignment == _alignment) return;
+		scaleAlignment = _alignment;
+		updateMatrix();
+	}
+
 	void ofxComponentBase::setWidth(float _width) {
 		setRect(ofRectangle(rect.x, rect.y, _width, rect.height));
 	}
@@ -253,11 +305,13 @@ namespace ofxComponent {
 	}
 
 	void ofxComponentBase::setScale(float _scale) {
+		if (scale == _scale) return;
 		scale = _scale;
 		updateMatrix();
 	}
 
 	void ofxComponentBase::setRotation(float _rotation) {
+		if (rotation == rotation) return;
 		rotation = _rotation;
 		updateMatrix();
 	}
@@ -327,6 +381,8 @@ namespace ofxComponent {
 		if (parent != nullptr) {
 			parent->addChild(shared_from_this());
 		}
+
+		updateGlobalMatrix();
 	}
 
 	void ofxComponentBase::removeParent() {
@@ -344,7 +400,7 @@ namespace ofxComponent {
 	void ofxComponentBase::insertChild(shared_ptr<ofxComponentBase>  _child, int index) {
 		bool alreadyListed = false;
 
-		for (auto &c : children) {
+		for (auto& c : children) {
 			if (c == _child) {
 				alreadyListed = true;
 				break;
@@ -379,7 +435,7 @@ namespace ofxComponent {
 			}
 		}
 	}
-	
+
 	shared_ptr<ofxComponentBase>  ofxComponentBase::getChild(int i) {
 		if (i < 0 || children.size() <= i) {
 			return nullptr;
@@ -397,14 +453,15 @@ namespace ofxComponent {
 
 		// make local
 		localMatrix = ofMatrix4x4();
-		localMatrix.translate(ofVec3f(-rect.width / 2, -rect.height / 2, 0));
+		if (scaleAlignment == Center) localMatrix.translate(ofVec3f(-rect.width / 2, -rect.height / 2, 0));
 		localMatrix.rotateRad(rotation * DEG_TO_RAD, 0, 0, 1);
 		localMatrix.scale(ofVec3f(scale, scale, scale));
 		localMatrix.translate(ofVec3f(rect.x, rect.y, 0));
-		localMatrix.translate(ofVec3f(rect.width / 2, rect.height / 2, 0));
+		if (scaleAlignment == Center) localMatrix.translate(ofVec3f(rect.width / 2, rect.height / 2, 0));
 
 		localMatrixInverse = localMatrix.getInverse();
 
+		onLocalMatrixChanged();
 		updateGlobalMatrix();
 	}
 
@@ -419,7 +476,7 @@ namespace ofxComponent {
 
 		globalMatrixInverse = globalMatrix.getInverse();
 
-		for (auto &c : children) {
+		for (auto& c : children) {
 			c->updateGlobalMatrix();
 		}
 	}

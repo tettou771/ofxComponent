@@ -16,6 +16,7 @@ namespace ofxComponent {
 		ofRemoveListener(ofEvents().mousePressed, this, &ofxComponentManager::mousePressed, OF_EVENT_ORDER_BEFORE_APP);
 		ofRemoveListener(ofEvents().mouseDragged, this, &ofxComponentManager::mouseDragged, OF_EVENT_ORDER_BEFORE_APP);
 		ofRemoveListener(ofEvents().mouseReleased, this, &ofxComponentManager::mouseReleased, OF_EVENT_ORDER_BEFORE_APP);
+		ofRemoveListener(ofEvents().mouseScrolled, this, &ofxComponentManager::mouseScrolled, OF_EVENT_ORDER_BEFORE_APP);
 		ofRemoveListener(ofEvents().fileDragEvent, this, &ofxComponentManager::dragEvent, OF_EVENT_ORDER_BEFORE_APP);
 	}
 
@@ -29,6 +30,7 @@ namespace ofxComponent {
 		ofAddListener(ofEvents().mousePressed, this, &ofxComponentManager::mousePressed, OF_EVENT_ORDER_BEFORE_APP);
 		ofAddListener(ofEvents().mouseDragged, this, &ofxComponentManager::mouseDragged, OF_EVENT_ORDER_BEFORE_APP);
 		ofAddListener(ofEvents().mouseReleased, this, &ofxComponentManager::mouseReleased, OF_EVENT_ORDER_BEFORE_APP);
+		ofAddListener(ofEvents().mouseScrolled, this, &ofxComponentManager::mouseScrolled, OF_EVENT_ORDER_BEFORE_APP);
 		ofAddListener(ofEvents().fileDragEvent, this, &ofxComponentManager::dragEvent, OF_EVENT_ORDER_BEFORE_APP);
 	}
 
@@ -58,6 +60,9 @@ namespace ofxComponent {
 	}
 	void ofxComponentManager::mouseReleased(ofMouseEventArgs &mouse) {
 		ofxComponentBase::mouseReleased(mouse);
+	}
+	void ofxComponentManager::mouseScrolled(ofMouseEventArgs &mouse) {
+		ofxComponentBase::mouseScrolled(mouse);
 	}
 	void ofxComponentManager::dragEvent(ofDragInfo &dragInfo) {
 		ofxComponentBase::dragEvent(dragInfo);
