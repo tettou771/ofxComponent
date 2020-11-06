@@ -1,6 +1,7 @@
 #include "ofxComponentBase.h"
 
 namespace ofxComponent {
+	vector<shared_ptr<ofxComponentBase> > ofxComponentBase::destroyedComponents;
 
 	ofxComponentBase::ofxComponentBase() {
 	}
@@ -18,18 +19,21 @@ namespace ofxComponent {
 	}
 
 	void ofxComponentBase::update(ofEventArgs& args) {
-		if (!isActive) return;
+		if (needStartExec) start();
+
+		if (destroyReserved && ofGetElapsedTimef() > destroyReservedTime) destroy();
+
+		if (!isActive || destroyed) return;
 
 		onUpdate();
 		for (int i = 0; i < children.size(); ++i) {
-			auto& c = children[i];
-			c->update(args);
+			children[i]->update(args);
 		}
 		postUpdate();
 	}
 
 	void ofxComponentBase::draw(ofEventArgs& args) {
-		if (!isActive) return;
+		if (!isActive || destroyed) return;
 
 		ofPushMatrix();
 		ofMultMatrix(getLocalMatrix());
@@ -56,6 +60,11 @@ namespace ofxComponent {
 			auto& c = children[i];
 			c->exit(args);
 		}
+	}
+
+	void ofxComponentBase::start() {
+		needStartExec = false;
+		onStart();
 	}
 
 	void ofxComponentBase::setActive(bool active) {
@@ -128,7 +137,7 @@ namespace ofxComponent {
 	void ofxComponentBase::mousePressed(ofMouseEventArgs& mouse) {
 		if (!isActive) return;
 
-		if (draggable && ofRectangle(0, 0, rect.width, rect.height).inside(getMousePos())) {
+		if (draggable && isMouseInside()) {
 			dragging = true;
 		}
 
@@ -205,6 +214,10 @@ namespace ofxComponent {
 
 	ofVec2f ofxComponentBase::getPos() {
 		return ofVec2f(rect.x, rect.y);
+	}
+
+	ofVec2f ofxComponentBase::getCenterPos() {
+		return rect.getCenter();
 	}
 
 	ofVec2f ofxComponentBase::getGlobalPos() {
@@ -311,7 +324,7 @@ namespace ofxComponent {
 	}
 
 	void ofxComponentBase::setRotation(float _rotation) {
-		if (rotation == rotation) return;
+		if (rotation == _rotation) return;
 		rotation = _rotation;
 		updateMatrix();
 	}
@@ -369,6 +382,18 @@ namespace ofxComponent {
 		return dragging;
 	}
 
+	bool ofxComponentBase::inside(ofVec2f p) {
+		return inside(p.x, p.y);
+	}
+
+	bool ofxComponentBase::inside(float x, float y) {
+		return ofRectangle(0, 0, rect.width, rect.height).inside(x, y);
+	}
+
+	bool ofxComponentBase::isMouseInside() {
+		return inside(getMouseX(), getMouseY());
+	}
+
 	void ofxComponentBase::setParent(shared_ptr<ofxComponentBase>  _parent) {
 		if (parent == _parent) return;
 
@@ -387,8 +412,9 @@ namespace ofxComponent {
 
 	void ofxComponentBase::removeParent() {
 		if (parent != nullptr) {
-			parent->removeChild(shared_from_this());
+			auto p = parent;
 			parent = nullptr;
+			p->removeChild(shared_from_this());
 		}
 	}
 
@@ -434,6 +460,26 @@ namespace ofxComponent {
 				break;
 			}
 		}
+	}
+
+	void ofxComponentBase::destroy() {
+		if (destroyed) return;
+
+		destroyed = true;
+		destroyedComponents.push_back(shared_from_this());
+		for (auto& c : children) {
+			c->destroy();
+		}
+	}
+
+	void ofxComponentBase::destroy(float delaySec) {
+		if (destroyed) return;
+		destroyReserved = true;
+		destroyReservedTime = ofGetElapsedTimef() + delaySec;
+	}
+
+	bool ofxComponentBase::isDestroyed() {
+		return destroyed;
 	}
 
 	shared_ptr<ofxComponentBase>  ofxComponentBase::getChild(int i) {

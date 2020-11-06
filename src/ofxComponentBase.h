@@ -27,6 +27,10 @@ namespace ofxComponent {
 		void exit(ofEventArgs&);
 		virtual void onExit() {}
 
+		// call on make component
+		void start();
+		virtual void onStart() {}
+
 		// acitive / disactive
 		void setActive(bool);
 		bool getActive() { return isActive; }
@@ -67,6 +71,7 @@ namespace ofxComponent {
 		ofRectangle getRect();
 		ofRectangle getGlobalRect();
 		ofVec2f getPos();
+		ofVec2f getCenterPos();
 		ofVec2f getGlobalPos();
 		Alignment getScaleAlignment();
 		float getParentWidth();
@@ -108,12 +113,21 @@ namespace ofxComponent {
 		void setDraggable(bool _draggable);
 		bool getDraggable();
 		bool getDragging();
+		bool inside(ofVec2f p);
+		bool inside(float x, float y);
+		bool isMouseInside();
 
+		// parent/child control
 		void setParent(shared_ptr<ofxComponentBase> _parent);
 		void removeParent();
 		void addChild(shared_ptr<ofxComponentBase> _child);
 		void insertChild(shared_ptr<ofxComponentBase> _child, int index);
 		void removeChild(shared_ptr<ofxComponentBase> _child);
+
+		// remove this
+		void destroy();
+		void destroy(float delaySec); // delay destroy [sec]
+		bool isDestroyed();
 
 		// component getter
 		shared_ptr<ofxComponentBase> getParent() { return parent; }
@@ -131,9 +145,15 @@ namespace ofxComponent {
 		void updateGlobalMatrix();
 		void globalActiveChanged(bool _globalActive);
 
+		bool needStartExec = true;
 		bool draggable = false, dragging = false;
+		bool destroyed = false, destroyReserved = false;
+		float destroyReservedTime;
 
 		shared_ptr<ofxComponentBase> parent = nullptr;
 		vector<shared_ptr<ofxComponentBase>> children;
+
+	protected:
+		static vector<shared_ptr<ofxComponentBase> > destroyedComponents;
 	};
 }

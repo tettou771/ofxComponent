@@ -36,6 +36,19 @@ namespace ofxComponent {
 
 	void ofxComponentManager::update(ofEventArgs &args) {
 		ofxComponentBase::update(args);
+
+		// remove destroyed object
+		while (!destroyedComponents.empty()) {
+			auto c = destroyedComponents.front();
+			if (c->isDestroyed()) {
+				for (auto& cc : c->getChildren()) {
+					cc->removeParent();
+				}
+				c->removeParent();
+
+				destroyedComponents.erase(destroyedComponents.begin());
+			}
+		}
 	}
 	void ofxComponentManager::draw(ofEventArgs &args) {
 		ofxComponentBase::draw(args);
