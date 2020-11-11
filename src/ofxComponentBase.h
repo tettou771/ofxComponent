@@ -65,7 +65,7 @@ namespace ofxComponent {
 
 		void dragEvent(ofDragInfo&);
 		virtual void onDragEvent(ofDragInfo&) {}
-		
+
 		virtual void onLocalMatrixChanged() {};
 
 		ofRectangle getRect();
@@ -147,13 +147,34 @@ namespace ofxComponent {
 
 		bool needStartExec = true;
 		bool draggable = false, dragging = false;
-		bool destroyed = false, destroyReserved = false;
-		float destroyReservedTime;
+		bool destroyed = false;
 
 		shared_ptr<ofxComponentBase> parent = nullptr;
 		vector<shared_ptr<ofxComponentBase>> children;
 
+	private:
+		typedef function<void()> TimerFunc;
+
+		class Timer : public ofThread {
+		public:
+			Timer(TimerFunc func, float wait, shared_ptr<ofxComponentBase> component);
+			void threadedFunction() override;
+			void cancel() { canceled = true; }
+		private:
+			TimerFunc function;
+			float waitSec;
+			shared_ptr<ofxComponentBase> component;
+			bool canceled = false;
+		};
+		
+		vector<Timer*> timerFunctionTimers;
+		ofMutex timerFunctionMutex;
+		vector<TimerFunc> timeoutFunctions;
+
 	protected:
+		void addTimerFunction(TimerFunc func, float wait);
+		void clearTimerFunctions();
+
 		static vector<shared_ptr<ofxComponentBase> > destroyedComponents;
 	};
 }

@@ -21,7 +21,20 @@ namespace ofxComponent {
 	void ofxComponentBase::update(ofEventArgs& args) {
 		if (needStartExec) start();
 
-		if (destroyReserved && ofGetElapsedTimef() > destroyReservedTime) destroy();
+		// delete expired timer
+		timerFunctionMutex.lock();
+		for (int i = 0; i < timerFunctionTimers.size(); ++i) {
+			if (!timerFunctionTimers[i]->isThreadRunning()) {
+ 				delete timerFunctionTimers[i];
+				timerFunctionTimers.erase(timerFunctionTimers.begin() + i);
+			}
+		}
+		// exec timer functions
+		while (!timeoutFunctions.empty()) {
+			timeoutFunctions.front()();
+			timeoutFunctions.erase(timeoutFunctions.begin());
+		}
+		timerFunctionMutex.unlock();
 
 		if (!isActive || destroyed) return;
 
@@ -33,6 +46,8 @@ namespace ofxComponent {
 	}
 
 	void ofxComponentBase::draw(ofEventArgs& args) {
+		if (needStartExec) start();
+
 		if (!isActive || destroyed) return;
 
 		ofPushMatrix();
@@ -87,6 +102,23 @@ namespace ofxComponent {
 				c->globalActiveChanged(_globalActive);
 			}
 		}
+	}
+
+	void ofxComponentBase::addTimerFunction(TimerFunc func, float wait) {
+		timerFunctionMutex.lock();
+		timerFunctionTimers.push_back(new Timer(func, wait, shared_from_this()));
+		timerFunctionMutex.unlock();
+	}
+
+	void ofxComponentBase::clearTimerFunctions() {
+		timerFunctionMutex.lock();
+		while (!timeoutFunctions.empty()) {
+			timeoutFunctions.erase(timeoutFunctions.begin());
+		}
+		for (auto& t : timerFunctionTimers) {
+			t->cancel();
+		}
+		timerFunctionMutex.unlock();
 	}
 
 	bool ofxComponentBase::getGlobalActive() {
@@ -470,12 +502,15 @@ namespace ofxComponent {
 		for (auto& c : children) {
 			c->destroy();
 		}
+
+		for (auto& t : timerFunctionTimers) {
+			delete t;
+		}
 	}
 
 	void ofxComponentBase::destroy(float delaySec) {
 		if (destroyed) return;
-		destroyReserved = true;
-		destroyReservedTime = ofGetElapsedTimef() + delaySec;
+		addTimerFunction([this] { destroy(); }, delaySec);
 	}
 
 	bool ofxComponentBase::isDestroyed() {
@@ -524,6 +559,18 @@ namespace ofxComponent {
 
 		for (auto& c : children) {
 			c->updateGlobalMatrix();
+		}
+	}
+	ofxComponentBase::Timer::Timer(TimerFunc func, float wait, shared_ptr<ofxComponentBase> component)
+		: function(func), waitSec(wait), component(component) {
+		startThread();
+	}
+	void ofxComponentBase::Timer::threadedFunction() {
+		ofSleepMillis(waitSec * 1000);
+		if (!canceled) {
+			component->timerFunctionMutex.lock();
+			component->timeoutFunctions.push_back(function);
+			component->timerFunctionMutex.unlock();
 		}
 	}
 }
