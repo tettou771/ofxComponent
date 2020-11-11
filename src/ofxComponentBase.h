@@ -155,21 +155,16 @@ namespace ofxComponent {
 	private:
 		typedef function<void()> TimerFunc;
 
-		class Timer : public ofThread {
+		class Timer {
 		public:
-			Timer(TimerFunc func, float wait, shared_ptr<ofxComponentBase> component);
-			void threadedFunction() override;
-			void cancel() { canceled = true; }
-		private:
+			Timer(TimerFunc func, float wait);
 			TimerFunc function;
-			float waitSec;
-			shared_ptr<ofxComponentBase> component;
+			float execTime;
 			bool canceled = false;
 		};
 		
-		vector<Timer*> timerFunctionTimers;
-		ofMutex timerFunctionMutex;
-		vector<TimerFunc> timeoutFunctions;
+		vector<Timer*> timerFunctions;
+		ofMutex timerFunctionsMutex;
 
 	protected:
 		void addTimerFunction(TimerFunc func, float wait);
