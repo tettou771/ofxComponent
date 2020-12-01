@@ -73,6 +73,7 @@ namespace ofxComponent {
 		ofVec2f getPos();
 		ofVec2f getCenterPos();
 		ofVec2f getGlobalPos();
+		ofVec2f getGlobalCenterPos();
 		Alignment getScaleAlignment();
 		float getParentWidth();
 		float getParentHeight();

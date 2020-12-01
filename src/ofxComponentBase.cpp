@@ -259,6 +259,10 @@ namespace ofxComponent {
 		return localToGlobalPos(ofVec2f());
 	}
 
+	ofVec2f ofxComponentBase::getGlobalCenterPos() {
+		return localToGlobalPos(ofVec2f(rect.width/2, rect.height/2));
+	}
+
 	Alignment ofxComponentBase::getScaleAlignment() {
 		return scaleAlignment;
 	}
