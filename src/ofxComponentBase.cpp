@@ -140,7 +140,7 @@ namespace ofxComponent {
 	}
 
 	void ofxComponentBase::keyPressed(ofKeyEventArgs& key) {
-		if (!isActive) return;
+		if (!isActive || !keyMouseEventEnabled) return;
 
 		onKeyPressed(key);
 		for (int i = 0; i < children.size(); ++i) {
@@ -150,7 +150,7 @@ namespace ofxComponent {
 	}
 
 	void ofxComponentBase::keyReleased(ofKeyEventArgs& key) {
-		if (!isActive) return;
+		if (!isActive || !keyMouseEventEnabled) return;
 
 		onKeyReleased(key);
 		for (int i = 0; i < children.size(); ++i) {
@@ -160,7 +160,7 @@ namespace ofxComponent {
 	}
 
 	void ofxComponentBase::mouseMoved(ofMouseEventArgs& mouse) {
-		if (!isActive) return;
+		if (!isActive || !keyMouseEventEnabled) return;
 
 		onMouseMoved(mouse);
 		for (int i = 0; i < children.size(); ++i) {
@@ -170,7 +170,7 @@ namespace ofxComponent {
 	}
 
 	void ofxComponentBase::mousePressed(ofMouseEventArgs& mouse) {
-		if (!isActive) return;
+		if (!isActive || !keyMouseEventEnabled) return;
 
 		if (draggable && isMouseInside()) {
 			dragging = true;
@@ -184,7 +184,7 @@ namespace ofxComponent {
 	}
 
 	void ofxComponentBase::mouseDragged(ofMouseEventArgs& mouse) {
-		if (!isActive) return;
+		if (!isActive || !keyMouseEventEnabled) return;
 
 		if (dragging) {
 			ofVec2f move = getMousePos() - getPreviousMousePos();
@@ -198,7 +198,7 @@ namespace ofxComponent {
 	}
 
 	void ofxComponentBase::mouseReleased(ofMouseEventArgs& mouse) {
-		if (!isActive) return;
+		if (!isActive || !keyMouseEventEnabled) return;
 
 		if (dragging) dragging = false;
 
@@ -210,7 +210,7 @@ namespace ofxComponent {
 	}
 
 	void ofxComponentBase::mouseScrolled(ofMouseEventArgs& mouse) {
-		if (!isActive) return;
+		if (!isActive || !keyMouseEventEnabled) return;
 
 		onMouseScrolled(mouse);
 		for (int i = 0; i < children.size(); ++i) {
@@ -220,12 +220,25 @@ namespace ofxComponent {
 	}
 
 	void ofxComponentBase::dragEvent(ofDragInfo& dragInfo) {
-		onDragEvent(dragInfo);
+		if (!isActive || !keyMouseEventEnabled) return;
 
+		onDragEvent(dragInfo);
 		for (int i = 0; i < children.size(); ++i) {
 			auto& c = children[i];
 			c->dragEvent(dragInfo);
 		}
+	}
+
+	void ofxComponentBase::setKeyMouseEventEnabled(bool enabled) {
+		keyMouseEventEnabled = enabled;
+	}
+
+	bool ofxComponentBase::toggleKeyMouseEventEnabled() {
+		return keyMouseEventEnabled = !keyMouseEventEnabled;
+	}
+
+	bool ofxComponentBase::getKeyMouseEventEnebled() {
+		return keyMouseEventEnabled;
 	}
 
 	ofRectangle ofxComponentBase::getRect() {

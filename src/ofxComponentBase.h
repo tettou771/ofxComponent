@@ -66,6 +66,11 @@ namespace ofxComponent {
 		void dragEvent(ofDragInfo&);
 		virtual void onDragEvent(ofDragInfo&) {}
 
+		// key and mouse enabled
+		void setKeyMouseEventEnabled(bool enabled);
+		bool toggleKeyMouseEventEnabled();
+		bool getKeyMouseEventEnebled();
+
 		virtual void onLocalMatrixChanged() {};
 
 		ofRectangle getRect();
@@ -137,6 +142,7 @@ namespace ofxComponent {
 
 	private:
 		bool isActive = true;
+		bool keyMouseEventEnabled = true;
 		ofRectangle rect;
 		float scale = 1.0;
 		Alignment scaleAlignment = Center;
