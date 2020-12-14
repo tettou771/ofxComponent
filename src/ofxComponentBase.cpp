@@ -27,25 +27,24 @@ namespace ofxComponent {
 		// exec expired timer functions
 		if (!timerFunctions.empty()) {
 			float now = ofGetElapsedTimef();
-			timerFunctionsMutex.lock();
-			for (auto itr = timerFunctions.begin(); itr != timerFunctions.end();) {
+			for (auto i = 0; i < timerFunctions.size(); ++i) {
 				{
-					auto tf = *itr;
+					auto tf = timerFunctions[i];
 					if (tf->canceled) {
 						delete tf;
-						itr = timerFunctions.erase(itr);
+						timerFunctions.erase(timerFunctions.begin() + i);
+						i--;
 					}
 					else if (tf->execTime <= now) {
 						tf->function();
 						delete tf;
-						itr = timerFunctions.erase(itr);
+						timerFunctions.erase(timerFunctions.begin() + i);
+						i--;
 					}
 					else {
-						itr++;
 					}
 				}
 			}
-			timerFunctionsMutex.unlock();
 		}
 
 		if (!isActive || destroyed) return;
@@ -119,9 +118,7 @@ namespace ofxComponent {
 	}
 
 	void ofxComponentBase::addTimerFunction(TimerFunc func, float wait) {
-		timerFunctionsMutex.lock();
 		timerFunctions.push_back(new Timer(func, wait));
-		timerFunctionsMutex.unlock();
 	}
 
 	void ofxComponentBase::clearTimerFunctions() {

@@ -174,7 +174,6 @@ namespace ofxComponent {
 		};
 
 		vector<Timer*> timerFunctions;
-		ofMutex timerFunctionsMutex;
 
 	public:
 		void addTimerFunction(TimerFunc func, float wait);
