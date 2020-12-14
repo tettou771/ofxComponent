@@ -7,7 +7,7 @@ namespace ofxComponent {
 		ofxComponentManager();
 		~ofxComponentManager();
 
-		void onSetup();
+		void onSetup() override;
 		void update(ofEventArgs &);
 		void draw(ofEventArgs &);
 		void exit(ofEventArgs &);

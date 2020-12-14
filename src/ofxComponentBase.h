@@ -10,7 +10,7 @@ namespace ofxComponent {
 	class ofxComponentBase : public enable_shared_from_this<ofxComponentBase> {
 	public:
 		ofxComponentBase();
-		virtual ~ofxComponentBase();
+		~ofxComponentBase();
 
 		// of events
 		void setup();
@@ -27,9 +27,12 @@ namespace ofxComponent {
 		void exit(ofEventArgs&);
 		virtual void onExit() {}
 
-		// call on make component
+		// call before first update
 		void start();
 		virtual void onStart() {}
+
+		// call on destroy
+		virtual void onDestroy() {}
 
 		// acitive / disactive
 		void setActive(bool);
@@ -169,14 +172,16 @@ namespace ofxComponent {
 			float execTime;
 			bool canceled = false;
 		};
-		
+
 		vector<Timer*> timerFunctions;
 		ofMutex timerFunctionsMutex;
 
-	protected:
+	public:
 		void addTimerFunction(TimerFunc func, float wait);
 		void clearTimerFunctions();
 
+	protected:
+		static vector<shared_ptr<ofxComponentBase> > allComponents;
 		static vector<shared_ptr<ofxComponentBase> > destroyedComponents;
 	};
 }

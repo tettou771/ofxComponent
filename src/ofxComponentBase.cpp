@@ -1,6 +1,7 @@
 #include "ofxComponentBase.h"
 
 namespace ofxComponent {
+	vector<shared_ptr<ofxComponentBase> > ofxComponentBase::allComponents;
 	vector<shared_ptr<ofxComponentBase> > ofxComponentBase::destroyedComponents;
 
 	ofxComponentBase::ofxComponentBase() {
@@ -27,18 +28,21 @@ namespace ofxComponent {
 		if (!timerFunctions.empty()) {
 			float now = ofGetElapsedTimef();
 			timerFunctionsMutex.lock();
-			for (int i = 0; i < timerFunctions.size(); ++i) {
-				auto tf = timerFunctions[i];
-				if (tf->canceled) {
-					delete tf;
-					timerFunctions.erase(timerFunctions.begin() + i);
-					--i;
-				}
-				else if (tf->execTime <= now) {
-					tf->function();
-					delete tf;
-					timerFunctions.erase(timerFunctions.begin() + i);
-					--i;
+			for (auto itr = timerFunctions.begin(); itr != timerFunctions.end();) {
+				{
+					auto tf = *itr;
+					if (tf->canceled) {
+						delete tf;
+						itr = timerFunctions.erase(itr);
+					}
+					else if (tf->execTime <= now) {
+						tf->function();
+						delete tf;
+						itr = timerFunctions.erase(itr);
+					}
+					else {
+						itr++;
+					}
 				}
 			}
 			timerFunctionsMutex.unlock();
@@ -86,6 +90,8 @@ namespace ofxComponent {
 	}
 
 	void ofxComponentBase::start() {
+		allComponents.push_back(shared_from_this());
+
 		needStartExec = false;
 		onStart();
 	}
@@ -273,7 +279,7 @@ namespace ofxComponent {
 	}
 
 	ofVec2f ofxComponentBase::getGlobalCenterPos() {
-		return localToGlobalPos(ofVec2f(rect.width/2, rect.height/2));
+		return localToGlobalPos(ofVec2f(rect.width / 2, rect.height / 2));
 	}
 
 	Alignment ofxComponentBase::getScaleAlignment() {
@@ -519,6 +525,7 @@ namespace ofxComponent {
 
 		destroyed = true;
 		destroyedComponents.push_back(shared_from_this());
+
 		for (auto& c : children) {
 			c->destroy();
 		}

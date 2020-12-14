@@ -5,7 +5,6 @@ namespace ofxComponent {
 	ofxComponentManager::ofxComponentManager() {
 	}
 
-
 	ofxComponentManager::~ofxComponentManager() {
 		ofRemoveListener(ofEvents().update, this, &ofxComponentManager::update, OF_EVENT_ORDER_BEFORE_APP);
 		ofRemoveListener(ofEvents().draw, this, &ofxComponentManager::draw, OF_EVENT_ORDER_BEFORE_APP);
@@ -46,7 +45,13 @@ namespace ofxComponent {
 				}
 				c->removeParent();
 
+				c->onDestroy();
 				destroyedComponents.erase(destroyedComponents.begin());
+
+				auto itr = find(allComponents.begin(), allComponents.end(), c);
+				if (itr != allComponents.end()) {
+					allComponents.erase(itr);
+				}
 			}
 		}
 	}
