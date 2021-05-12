@@ -485,27 +485,30 @@ namespace ofxComponent {
 	void ofxComponentBase::insertChild(shared_ptr<ofxComponentBase>  _child, int index) {
 		bool alreadyListed = false;
 
+		int i = 0;
 		for (auto& c : children) {
 			if (c == _child) {
 				alreadyListed = true;
+				children.erase(children.begin() + i);
 				break;
 			}
+			++i;
+		}
+
+		// add to back if index is over
+		if (children.size() <= index) {
+			children.push_back(_child);
+		}
+
+		else if (0 <= index) {
+			children.insert(children.begin() + index, _child);
+		}
+
+		else {
+			children.insert(children.begin(), _child);
 		}
 
 		if (!alreadyListed) {
-			// add to back if index is over
-			if (children.size() <= index) {
-				children.push_back(_child);
-			}
-
-			else if (0 <= index) {
-				children.insert(children.begin() + index, _child);
-			}
-
-			else {
-				children.insert(children.begin(), _child);
-			}
-
 			_child->setParent(shared_from_this());
 		}
 	}
