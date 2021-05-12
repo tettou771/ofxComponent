@@ -121,6 +121,7 @@ namespace ofxComponent {
 		// drag
 		void setDraggable(bool _draggable);
 		bool getDraggable();
+		void setDragging(bool _dragging);
 		bool getDragging();
 		bool inside(ofVec2f p);
 		bool inside(float x, float y);

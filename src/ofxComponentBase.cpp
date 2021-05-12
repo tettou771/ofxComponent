@@ -433,6 +433,10 @@ namespace ofxComponent {
 		return draggable;
 	}
 
+	void ofxComponentBase::setDragging(bool _dragging) {
+		dragging = _dragging;
+	}
+
 	bool ofxComponentBase::getDragging() {
 		return dragging;
 	}
