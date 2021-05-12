@@ -157,8 +157,9 @@ namespace ofxComponent {
 		void globalActiveChanged(bool _globalActive);
 
 		bool needStartExec = true;
-		bool draggable = false, dragging = false;
+		bool draggable = false;
 		bool destroyed = false;
+		static shared_ptr<ofxComponentBase> draggingComponent;
 
 		shared_ptr<ofxComponentBase> parent = nullptr;
 		vector<shared_ptr<ofxComponentBase>> children;

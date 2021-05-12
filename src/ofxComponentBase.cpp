@@ -3,6 +3,7 @@
 namespace ofxComponent {
 	vector<shared_ptr<ofxComponentBase> > ofxComponentBase::allComponents;
 	vector<shared_ptr<ofxComponentBase> > ofxComponentBase::destroyedComponents;
+	shared_ptr<ofxComponentBase> ofxComponentBase::draggingComponent = nullptr;
 
 	ofxComponentBase::ofxComponentBase() {
 	}
@@ -176,7 +177,7 @@ namespace ofxComponent {
 		if (!isActive || !keyMouseEventEnabled) return;
 
 		if (draggable && isMouseInside()) {
-			dragging = true;
+			setDragging(true);
 		}
 
 		onMousePressed(mouse);
@@ -189,7 +190,7 @@ namespace ofxComponent {
 	void ofxComponentBase::mouseDragged(ofMouseEventArgs& mouse) {
 		if (!isActive || !keyMouseEventEnabled) return;
 
-		if (dragging) {
+		if (getDragging()) {
 			ofVec2f move = getMousePos() - getPreviousMousePos();
 			setPos(getPos() + move);
 		}
@@ -203,7 +204,7 @@ namespace ofxComponent {
 	void ofxComponentBase::mouseReleased(ofMouseEventArgs& mouse) {
 		if (!isActive || !keyMouseEventEnabled) return;
 
-		if (dragging) dragging = false;
+		if (getDragging()) setDragging(false);
 
 		onMouseReleased(mouse);
 		for (int i = 0; i < children.size(); ++i) {
@@ -426,7 +427,7 @@ namespace ofxComponent {
 
 	void ofxComponentBase::setDraggable(bool _draggable) {
 		draggable = _draggable;
-		if (!draggable) dragging = false;
+		if (!draggable) setDragging(false);
 	}
 
 	bool ofxComponentBase::getDraggable() {
@@ -434,11 +435,12 @@ namespace ofxComponent {
 	}
 
 	void ofxComponentBase::setDragging(bool _dragging) {
-		dragging = _dragging;
+		if (_dragging) draggingComponent = shared_from_this();
+		else if (getDragging()) draggingComponent = nullptr;
 	}
 
 	bool ofxComponentBase::getDragging() {
-		return dragging;
+		return draggingComponent == shared_from_this();
 	}
 
 	bool ofxComponentBase::inside(ofVec2f p) {
@@ -529,6 +531,7 @@ namespace ofxComponent {
 
 		destroyed = true;
 		destroyedComponents.push_back(shared_from_this());
+		setDragging(false);
 
 		for (auto& c : children) {
 			c->destroy();
