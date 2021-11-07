@@ -5,10 +5,10 @@
 
 using namespace ofxComponent;
 
-// position coordinate demo
+// position coordination
 class YellowComponent : public ofxComponentBase {
-	void onSetup() override {
-		setRect(ofRectangle(50, 100, 300, 200));
+	void onStart() override {
+		setRect(ofRectangle(50, 100, 400, 300));
 		setRotation(30);
 		setScale(0.7);
 	}
@@ -24,24 +24,26 @@ class YellowComponent : public ofxComponentBase {
 
 			// draw local and global position
 			ofVec2f localMouse = getMousePos();
-			ofVec2f global = localToGlobalPos(localMouse);
 			stringstream ss;
-			ss << "local (" << localMouse.x << ", " << localMouse.y << ")" << "\nglobal (" << ofGetMouseX() << ", " << ofGetMouseY() << ")"
-				<< "\nglobal (" << global.x << ", " << global.y << ")";
+			ss << "local (" << localMouse.x << ", " << localMouse.y << ")" << "\nglobal (" << ofGetMouseX() << ", " << ofGetMouseY() << ")";
 			ofDrawBitmapString(ss.str(), getMouseX() + 20, getMouseY());
+
+			// if you wanna get global pos from local,
+			// use this: localToGlobalPos(localPosition);
 		}
 	}
 };
 
-// drag demo
+// draggable component
 class BlueComponent : public ofxComponentBase {
-	void onSetup() override {
+	void onStart() override {
 		setDraggable(true);
 		setRect(ofRectangle(20, 20, 60, 60));
 	}
 	void onDraw() override {
+		// light color when dragging
 		if (getDragging()) {
-			ofSetColor(ofColor::cyan);
+			ofSetColor(ofColor(100, 100, 255));
 		}
 		else {
 			ofSetColor(ofColor::blue);
@@ -56,11 +58,10 @@ class BlueComponent : public ofxComponentBase {
 
 // parent compornent demo
 class RedComponent : public ofxComponentBase {
-	void onSetup() override {
-		yellowInRed = make_shared<YellowComponent>();
-		addChild(yellowInRed);
+	void onStart() override {
 		blueInRed = make_shared<BlueComponent>();
 		addChild(blueInRed);
+		setDraggable(true);
 	}
 	void onUpdate() override {
 		ofLog() << "RedComponent onUpdate()";
@@ -78,7 +79,7 @@ class RedComponent : public ofxComponentBase {
 		}
 	}
 	void postDraw() override {
-		ofSetColor(ofColor::black);
+		ofSetColor(ofColor::white);
 		for (int y = 25; y < getHeight(); y += 50) {
 			ofDrawBitmapString("Draw AFTER child components.", 100, y);
 		}
