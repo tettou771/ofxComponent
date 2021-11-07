@@ -526,6 +526,19 @@ namespace ofxComponent {
 		}
 	}
 
+    void ofxComponentBase::swapChild(int indexA, int indexB) {
+        if (indexA < 0 || indexB < 0 || indexA >= children.size() || indexB >= children.size()) {
+            ofLogWarning() << "swapChild(): invalid index " << indexA << " and " << indexB;
+            return;
+        }
+        if (indexA == indexB) {
+            return;
+        }
+        auto A = children[indexA];
+        children[indexA] = children[indexB];
+        children[indexB] = A;
+    }
+
 	void ofxComponentBase::destroy() {
 		if (destroyed) return;
 

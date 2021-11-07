@@ -133,6 +133,7 @@ namespace ofxComponent {
 		void addChild(shared_ptr<ofxComponentBase> _child);
 		void insertChild(shared_ptr<ofxComponentBase> _child, int index);
 		void removeChild(shared_ptr<ofxComponentBase> _child);
+        void swapChild(int indexA, int indexB);
 
 		// remove this
 		void destroy();
