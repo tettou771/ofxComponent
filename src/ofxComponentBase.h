@@ -176,6 +176,7 @@ namespace ofxComponent {
 			bool canceled = false;
 		};
 
+    protected:
 		vector<Timer*> timerFunctions;
 
 	public:
