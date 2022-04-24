@@ -139,7 +139,7 @@ namespace ofxComponent {
 			}
 		}
 		else {
-			false;
+			return false;
 		}
 	}
 
