@@ -135,6 +135,10 @@ namespace ofxComponent {
 		void removeChild(shared_ptr<ofxComponentBase> _child);
         void swapChild(int indexA, int indexB);
 
+		// constrain children
+		void setConstrain(bool _constrain);
+		bool getConstrain();
+
 		// remove this
 		void destroy();
 		void destroy(float delaySec); // delay destroy [sec]
@@ -156,6 +160,10 @@ namespace ofxComponent {
 		void updateMatrix();
 		void updateGlobalMatrix();
 		void globalActiveChanged(bool _globalActive);
+
+		// constrain draw in the rect
+		bool constrain = false;
+		ofFbo constrainFbo;
 
 		bool needStartExec = true;
 		bool draggable = false;

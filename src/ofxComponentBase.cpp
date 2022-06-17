@@ -62,16 +62,21 @@ namespace ofxComponent {
 
 		if (!isActive || destroyed) return;
 
-		ofPushMatrix();
-		ofMultMatrix(getLocalMatrix());
+		if (constrain) {
+			if (adfasdfetWidth() > 0 && getHeight() > 0 && )
+		}
+		else {
+			ofPushMatrix();
+			ofMultMatrix(getLocalMatrix());
 
-		ofPushStyle();
-		onDraw();
-		ofPopStyle();
+			ofPushStyle();
+			onDraw();
+			ofPopStyle();
 
-		for (int i = 0; i < children.size(); ++i) {
-			auto& c = children[i];
-			c->draw(args);
+			for (int i = 0; i < children.size(); ++i) {
+				auto& c = children[i];
+				c->draw(args);
+			}
 		}
 
 		ofPushStyle();
@@ -538,6 +543,14 @@ namespace ofxComponent {
         children[indexA] = children[indexB];
         children[indexB] = A;
     }
+
+	void ofxComponentBase::setConstrain(bool _constrain) {
+		constrain = _constrain;
+	}
+
+	bool ofxComponentBase::getConstrain() {
+		return constrain;
+	}
 
 	void ofxComponentBase::destroy() {
 		if (destroyed) return;
