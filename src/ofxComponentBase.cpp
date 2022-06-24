@@ -62,26 +62,44 @@ namespace ofxComponent {
 
 		if (!isActive || destroyed) return;
 
-		if (constrain) {
-			if (adfasdfetWidth() > 0 && getHeight() > 0 && )
-		}
-		else {
-			ofPushMatrix();
-			ofMultMatrix(getLocalMatrix());
+        ofPushMatrix();
+        ofMultMatrix(getLocalMatrix());
 
-			ofPushStyle();
-			onDraw();
-			ofPopStyle();
+        // draw in constrainFbo
+        bool isCurrentConstrain = constrain;
+		if (isCurrentConstrain) {
+            // resize fbo if needed
+			if (getWidth() > 0 && getHeight() > 0 &&
+                (getWidth() != constrainFbo.getWidth() || getHeight() != constrainFbo.getHeight())) {
+                constrainFbo.allocate(getWidth(), getHeight());
+            }
+            
+            if (!constrainFbo.isAllocated()) {
+                constrainFbo.allocate(MAX(1, getWidth()), MAX(1, getHeight()));
+            }
+            
+            // draw in fbo
+            constrainFbo.begin();
+            ofClear(0, 0, 0, 0);
+        }
+        
+        ofPushStyle();
+        onDraw();
+        ofPopStyle();
 
-			for (int i = 0; i < children.size(); ++i) {
-				auto& c = children[i];
-				c->draw(args);
-			}
-		}
+        for (int i = 0; i < children.size(); ++i) {
+            auto& c = children[i];
+            c->draw(args);
+        }
 
 		ofPushStyle();
 		postDraw();
 		ofPopStyle();
+
+        if (isCurrentConstrain) {
+            constrainFbo.end();
+            constrainFbo.draw(0, 0);
+        }
 
 		ofPopMatrix();
 	}
@@ -170,6 +188,7 @@ namespace ofxComponent {
 
 	void ofxComponentBase::mouseMoved(ofMouseEventArgs& mouse) {
 		if (!isActive || !keyMouseEventEnabled) return;
+        if (constrain && !isMouseInside()) return;
 
 		onMouseMoved(mouse);
 		for (int i = 0; i < children.size(); ++i) {
@@ -180,6 +199,7 @@ namespace ofxComponent {
 
 	void ofxComponentBase::mousePressed(ofMouseEventArgs& mouse) {
 		if (!isActive || !keyMouseEventEnabled) return;
+        if (constrain && !isMouseInside()) return;
 
 		if (draggable && isMouseInside()) {
 			setDragging(true);
@@ -194,6 +214,7 @@ namespace ofxComponent {
 
 	void ofxComponentBase::mouseDragged(ofMouseEventArgs& mouse) {
 		if (!isActive || !keyMouseEventEnabled) return;
+        if (constrain && !isMouseInside()) return;
 
 		if (getDragging()) {
 			ofVec2f move = getMousePos() - getPreviousMousePos();
@@ -208,6 +229,7 @@ namespace ofxComponent {
 
 	void ofxComponentBase::mouseReleased(ofMouseEventArgs& mouse) {
 		if (!isActive || !keyMouseEventEnabled) return;
+        if (constrain && !isMouseInside()) return;
 
 		if (getDragging()) setDragging(false);
 
@@ -220,6 +242,7 @@ namespace ofxComponent {
 
 	void ofxComponentBase::mouseScrolled(ofMouseEventArgs& mouse) {
 		if (!isActive || !keyMouseEventEnabled) return;
+        if (constrain && !isMouseInside()) return;
 
 		onMouseScrolled(mouse);
 		for (int i = 0; i < children.size(); ++i) {
@@ -230,6 +253,7 @@ namespace ofxComponent {
 
 	void ofxComponentBase::dragEvent(ofDragInfo& dragInfo) {
 		if (!isActive || !keyMouseEventEnabled) return;
+        if (constrain && !isMouseInside()) return;
 
 		onDragEvent(dragInfo);
 		for (int i = 0; i < children.size(); ++i) {
