@@ -19,7 +19,7 @@ class YellowComponent : public ofxComponentBase {
 		// draw cursor pos that is relative coordination.
 		if (0 < getMouseX() && getMouseX() < getWidth()
 			&& 0 < getMouseY() && getMouseY() < getHeight()) {
-			ofSetColor(ofColor::gray);
+			ofSetColor(ofColor::darkGray);
 			ofDrawCircle(getMouseX(), getMouseY(), 10);
 
 			// draw local and global position
@@ -37,12 +37,12 @@ class YellowComponent : public ofxComponentBase {
 // draggable component
 class BlueComponent : public ofxComponentBase {
 	void onStart() override {
-		setDraggable(true);
-		setRect(ofRectangle(20, 20, 60, 60));
+        setMovable(true);
+		setRect(ofRectangle(20, 20, 100, 100));
 	}
 	void onDraw() override {
 		// light color when dragging
-		if (getDragging()) {
+		if (getMoving()) {
 			ofSetColor(ofColor(100, 100, 255));
 		}
 		else {
@@ -61,7 +61,10 @@ class RedComponent : public ofxComponentBase {
 	void onStart() override {
 		blueInRed = make_shared<BlueComponent>();
 		addChild(blueInRed);
-		setDraggable(true);
+        setMovable(true);
+        
+        // children will draw only in this component area (with FBO)
+        setConstrain(true);
 	}
 	void onUpdate() override {
 		ofLog() << "RedComponent onUpdate()";

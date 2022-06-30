@@ -119,10 +119,10 @@ namespace ofxComponent {
 		ofMatrix4x4 getGlobalMatrixInverse();
 
 		// drag
-		void setDraggable(bool _draggable);
-		bool getDraggable();
-		void setDragging(bool _dragging);
-		bool getDragging();
+		void setMovable(bool _movable);
+		bool getMovable();
+		void setMoving(bool _moving);
+		bool getMoving();
 		bool inside(ofVec2f p);
 		bool inside(float x, float y);
 		bool isMouseInside();
@@ -166,9 +166,9 @@ namespace ofxComponent {
 		ofFbo constrainFbo;
 
 		bool needStartExec = true;
-		bool draggable = false;
+		bool movable = false;
 		bool destroyed = false;
-		static shared_ptr<ofxComponentBase> draggingComponent;
+		static shared_ptr<ofxComponentBase> movingComponent;
 
 		shared_ptr<ofxComponentBase> parent = nullptr;
 		vector<shared_ptr<ofxComponentBase>> children;

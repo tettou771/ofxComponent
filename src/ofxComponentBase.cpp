@@ -3,7 +3,7 @@
 namespace ofxComponent {
 	vector<shared_ptr<ofxComponentBase> > ofxComponentBase::allComponents;
 	vector<shared_ptr<ofxComponentBase> > ofxComponentBase::destroyedComponents;
-	shared_ptr<ofxComponentBase> ofxComponentBase::draggingComponent = nullptr;
+	shared_ptr<ofxComponentBase> ofxComponentBase::movingComponent = nullptr;
 
 	ofxComponentBase::ofxComponentBase() {
 	}
@@ -201,8 +201,8 @@ namespace ofxComponent {
 		if (!isActive || !keyMouseEventEnabled) return;
         if (constrain && !isMouseInside()) return;
 
-		if (draggable && isMouseInside()) {
-			setDragging(true);
+		if (movable && isMouseInside()) {
+			setMoving(true);
 		}
 
 		onMousePressed(mouse);
@@ -216,7 +216,7 @@ namespace ofxComponent {
 		if (!isActive || !keyMouseEventEnabled) return;
         if (constrain && !isMouseInside()) return;
 
-		if (getDragging()) {
+		if (getMoving()) {
 			ofVec2f move = getMousePos() - getPreviousMousePos();
 			setPos(getPos() + move);
 		}
@@ -231,7 +231,7 @@ namespace ofxComponent {
 		if (!isActive || !keyMouseEventEnabled) return;
         if (constrain && !isMouseInside()) return;
 
-		if (getDragging()) setDragging(false);
+		if (getMoving()) setMoving(false);
 
 		onMouseReleased(mouse);
 		for (int i = 0; i < children.size(); ++i) {
@@ -454,22 +454,22 @@ namespace ofxComponent {
 		return globalMatrixInverse;
 	}
 
-	void ofxComponentBase::setDraggable(bool _draggable) {
-		draggable = _draggable;
-		if (!draggable) setDragging(false);
+	void ofxComponentBase::setMovable(bool _movable) {
+		movable = _movable;
+		if (!movable) setMoving(false);
 	}
 
-	bool ofxComponentBase::getDraggable() {
-		return draggable;
+	bool ofxComponentBase::getMovable() {
+		return movable;
 	}
 
-	void ofxComponentBase::setDragging(bool _dragging) {
-		if (_dragging) draggingComponent = shared_from_this();
-		else if (getDragging()) draggingComponent = nullptr;
+	void ofxComponentBase::setMoving(bool _moving) {
+		if (_moving) movingComponent = shared_from_this();
+		else if (getMoving()) movingComponent = nullptr;
 	}
 
-	bool ofxComponentBase::getDragging() {
-		return draggingComponent == shared_from_this();
+	bool ofxComponentBase::getMoving() {
+		return movingComponent == shared_from_this();
 	}
 
 	bool ofxComponentBase::inside(ofVec2f p) {
@@ -581,7 +581,7 @@ namespace ofxComponent {
 
 		destroyed = true;
 		destroyedComponents.push_back(shared_from_this());
-		setDragging(false);
+		setMoving(false);
 
 		for (auto& c : children) {
 			c->destroy();
