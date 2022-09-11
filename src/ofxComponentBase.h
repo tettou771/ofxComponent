@@ -148,6 +148,15 @@ namespace ofxComponent {
 		shared_ptr<ofxComponentBase> getParent() { return parent; }
 		vector<shared_ptr<ofxComponentBase>> getChildren() { return children; }
 		shared_ptr<ofxComponentBase> getChild(int i);
+        
+        // get shared_ptr
+        shared_ptr<ofxComponentBase> getThis() {
+            return shared_from_this();
+        }
+        template<typename T>
+        inline shared_ptr<T> getThisAs() {
+            return dynamic_pointer_cast<T>(shared_from_this());
+        }
 
 	private:
 		bool isActive = true;
