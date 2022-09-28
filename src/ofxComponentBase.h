@@ -1,6 +1,13 @@
 #pragma once
 #include "ofMain.h"
 
+#ifndef TAU
+#define TAU 6.28318530717958647693
+#endif
+#ifndef HALF_TAU
+#define HALF_TAU 3.14159265358979323846
+#endif
+
 namespace ofxComponent {
 	enum Alignment {
 		Cornar,
