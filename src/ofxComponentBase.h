@@ -72,11 +72,16 @@ namespace ofxComponent {
 
 		void mouseScrolled(ofMouseEventArgs&);
 		virtual void onMouseScrolled(ofMouseEventArgs&) {};
-
+        
 		void dragEvent(ofDragInfo&);
 		virtual void onDragEvent(ofDragInfo&) {}
 
-		// key and mouse enabled
+        // exec only most front object
+        virtual void onMousePressedTop(){}
+        // check is this top (most front) layer
+        bool isTopComponent();
+        
+        // key and mouse enabled
 		void setKeyMouseEventEnabled(bool enabled);
 		bool toggleKeyMouseEventEnabled();
 		bool getKeyMouseEventEnebled();
@@ -132,6 +137,8 @@ namespace ofxComponent {
 		bool getMoving();
 		bool inside(ofVec2f p);
 		bool inside(float x, float y);
+        
+        // is mouse pointer on this
 		bool isMouseInside();
 
 		// parent/child control
@@ -183,6 +190,7 @@ namespace ofxComponent {
 
 		bool needStartExec = true;
 		bool movable = false;
+        bool mostFrontMousePressing = false;
 		bool destroyed = false;
 		static shared_ptr<ofxComponentBase> movingComponent;
 
@@ -210,5 +218,6 @@ namespace ofxComponent {
 	protected:
 		static vector<shared_ptr<ofxComponentBase> > allComponents;
 		static vector<shared_ptr<ofxComponentBase> > destroyedComponents;
+        static shared_ptr<ofxComponentBase> mostTopComponent;
 	};
 }

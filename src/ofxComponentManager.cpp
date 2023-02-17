@@ -34,6 +34,22 @@ namespace ofxComponent {
 	}
 
 	void ofxComponentManager::update(ofEventArgs &args) {
+        // check most top component
+        mostTopComponent = nullptr;
+        std::function<void(vector<shared_ptr<ofxComponentBase> >)> checkMostTop = [&](vector<shared_ptr<ofxComponentBase> > list){
+            for (shared_ptr<ofxComponentBase> c : list) {
+                if (c->isMouseInside()) {
+                    mostTopComponent = c;
+                }
+                vector<shared_ptr<ofxComponentBase> > clist = c->getChildren();
+                checkMostTop(clist);
+            }
+        };
+        
+        auto list = getChildren();
+        checkMostTop(list);
+        
+        
 		ofxComponentBase::update(args);
 
 		// remove destroyed object
@@ -85,4 +101,6 @@ namespace ofxComponent {
 	void ofxComponentManager::dragEvent(ofDragInfo &dragInfo) {
 		ofxComponentBase::dragEvent(dragInfo);
 	}
+
+
 }
