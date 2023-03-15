@@ -19,5 +19,7 @@ namespace ofxComponent {
 		void mouseReleased(ofMouseEventArgs &);
 		void mouseScrolled(ofMouseEventArgs &);
 		void dragEvent(ofDragInfo &);
+        
+        static shared_ptr<ofxComponentManager> singleton;
 	};
 }

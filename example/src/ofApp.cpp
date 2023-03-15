@@ -19,16 +19,30 @@ void ofApp::setup(){
 	*/
 
 	// make shared pointer instance
-	red = make_shared<RedComponent>();
-	red->setRect(ofRectangle(500, 100, 400, 400)); // set position and size if needed
-	yellow = make_shared<YellowComponent>();
-	blue = make_shared<BlueComponent>();
+	auto red = make_shared<RedComponent>();
+    // set position and size with rectangle
+    red->setRect(ofRectangle(150, 20, 400, 400));
+    
+	auto yellow = make_shared<YellowComponent>();
+    // another way, set size, position, rotation and scale individualy
+    yellow->setWidth(400);
+    yellow->setHeight(300);
+    yellow->setPos(ofVec2f(600, 50));
+    yellow->setRotation(30);
+    yellow->setScale(0.7);
+
+	auto blue = make_shared<BlueComponent>();
+    // blue position is set when BlueComponent::onStart()
+    
+    auto green = make_shared<GreenComponent>();
+    green->setRect(ofRectangle(50, 400, 280, 180));
 
 	// Add children
 	// draw() and update() etc... is sorted by this order
 	manager->addChild(red);
 	manager->addChild(yellow);
 	manager->addChild(blue);
+    manager->addChild(green);
 
 	// Setup all objects
 	// Please call this after children add

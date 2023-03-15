@@ -76,11 +76,27 @@ namespace ofxComponent {
 		void dragEvent(ofDragInfo&);
 		virtual void onDragEvent(ofDragInfo&) {}
 
-        // exec only most front object
-        virtual void onMousePressedTop(){}
-        // check is this top (most front) layer
-        bool isTopComponent();
+        // This method is called when the mouse is pressed down while over the topmost visible component, even if multiple components are overlapping.
+        // It handles the actions or events that should occur in response to the mouse press on that topmost component.
+        // This ensures that only the foremost layer receives the event, making it particularly useful for triggering events, such as button clicks or starting a drag action, when interacting with overlapping UI components.
+        virtual void onMousePressedOverComponent(ofMouseEventArgs&){}
+
+        // is mouse pointer on this
+        // When using this for creating UI elements, there may be issues with multiple overlapping buttons.
+        // Consider using isMouseOver() as well.
+        bool isMouseInside();
+
+        // isMouseOver() returns true when the mouse pointer is hovering over an object and the object is located on the top layer.
+        // When implementing UI elements such as buttons, if multiple buttons overlap, using isMouseInside() alone may cause multiple objects to respond.
+        // To prevent this, by also checking whether the object is on the top layer, simultaneous pressing of overlapping buttons can be avoided.
+        // In addition, when implementing buttons, another option is to register events with mousePressedTopEvents.
+        bool isMouseOver();
         
+        // This method returns true while the mouse is clicked and held over the component.
+        // It continues to return true even if the mouse is dragged outside of the component.
+        // This behavior is useful for recognizing mouse movements when dragging a component, even when outside of its bounds.
+        bool isMousePressedOverComponent();
+
         // key and mouse enabled
 		void setKeyMouseEventEnabled(bool enabled);
 		bool toggleKeyMouseEventEnabled();
@@ -138,9 +154,6 @@ namespace ofxComponent {
 		bool inside(ofVec2f p);
 		bool inside(float x, float y);
         
-        // is mouse pointer on this
-		bool isMouseInside();
-
 		// parent/child control
 		void setParent(shared_ptr<ofxComponentBase> _parent);
 		void removeParent();
@@ -149,7 +162,10 @@ namespace ofxComponent {
 		void removeChild(shared_ptr<ofxComponentBase> _child);
         void swapChild(int indexA, int indexB);
 
-		// constrain children
+        // Set constrain to true when you want to draw child components only within the size defined by the rect of the parent component.
+        // Internally, an FBO is created and used to draw the contents, which are then redrawn, resulting in slightly increased memory usage.
+        // This can be used, for example, when implementing a window and you want to draw child components only within the window.
+        // onMousePressed() collider will also be constrained within the bounds of the parent component.
 		void setConstrain(bool _constrain);
 		bool getConstrain();
 
@@ -171,6 +187,10 @@ namespace ofxComponent {
         inline shared_ptr<T> getThisAs() {
             return dynamic_pointer_cast<T>(shared_from_this());
         }
+        
+        // This is triggered when a button is pressed and the button is located at the top layer at that coordinate.
+        // In this case, use ofAddListener() and provide the instance of this class's mousePressedTopEvents as the first argument.
+        ofEvent<void> mousePressedOverComponentEvents;
 
 	private:
 		bool isActive = true;
@@ -190,7 +210,7 @@ namespace ofxComponent {
 
 		bool needStartExec = true;
 		bool movable = false;
-        bool mostFrontMousePressing = false;
+        bool mousePressedOverComponent = false;
 		bool destroyed = false;
 		static shared_ptr<ofxComponentBase> movingComponent;
 
@@ -218,6 +238,6 @@ namespace ofxComponent {
 	protected:
 		static vector<shared_ptr<ofxComponentBase> > allComponents;
 		static vector<shared_ptr<ofxComponentBase> > destroyedComponents;
-        static shared_ptr<ofxComponentBase> mostTopComponent;
+        static shared_ptr<ofxComponentBase> mouseOverComponent;
 	};
 }

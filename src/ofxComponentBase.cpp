@@ -4,7 +4,7 @@ using namespace ofxComponent;
 vector<shared_ptr<ofxComponentBase> > ofxComponentBase::allComponents;
 vector<shared_ptr<ofxComponentBase> > ofxComponentBase::destroyedComponents;
 shared_ptr<ofxComponentBase> ofxComponentBase::movingComponent = nullptr;
-shared_ptr<ofxComponentBase>  ofxComponentBase::mostTopComponent = nullptr;
+shared_ptr<ofxComponentBase>  ofxComponentBase::mouseOverComponent = nullptr;
 
 ofxComponentBase::ofxComponentBase() {
 }
@@ -202,11 +202,19 @@ void ofxComponentBase::mousePressed(ofMouseEventArgs& mouse) {
     if (!isActive || !keyMouseEventEnabled) return;
     if (constrain && !isMouseInside()) return;
     
-    if (movable && isMouseInside()) {
+    if (movable && isMouseOver()) {
         setMoving(true);
     }
     
     onMousePressed(mouse);
+    
+    // if this object is top (on mouse)
+    if (isMouseOver()) {
+        mousePressedOverComponent = true;
+        onMousePressedOverComponent(mouse);
+        ofNotifyEvent(mousePressedOverComponentEvents);
+    }
+    
     for (int i = 0; i < children.size(); ++i) {
         auto& c = children[i];
         c->mousePressed(mouse);
@@ -229,6 +237,8 @@ void ofxComponentBase::mouseDragged(ofMouseEventArgs& mouse) {
 }
 
 void ofxComponentBase::mouseReleased(ofMouseEventArgs& mouse) {
+    mousePressedOverComponent = false;
+
     if (!isActive || !keyMouseEventEnabled) return;
     if (constrain && !isMouseInside()) return;
     
@@ -263,8 +273,16 @@ void ofxComponentBase::dragEvent(ofDragInfo& dragInfo) {
     }
 }
 
-bool ofxComponentBase::isTopComponent() {
-    return mostTopComponent == shared_from_this();
+bool ofxComponentBase::isMouseInside() {
+    return inside(getMouseX(), getMouseY());
+}
+
+bool ofxComponentBase::isMouseOver() {
+    return mouseOverComponent == shared_from_this();
+}
+
+bool ofxComponentBase::isMousePressedOverComponent() {
+    return mousePressedOverComponent;
 }
 
 void ofxComponentBase::setKeyMouseEventEnabled(bool enabled) {
@@ -483,10 +501,6 @@ bool ofxComponentBase::inside(ofVec2f p) {
 
 bool ofxComponentBase::inside(float x, float y) {
     return ofRectangle(0, 0, rect.width, rect.height).inside(x, y);
-}
-
-bool ofxComponentBase::isMouseInside() {
-    return inside(getMouseX(), getMouseY());
 }
 
 void ofxComponentBase::setParent(shared_ptr<ofxComponentBase>  _parent) {

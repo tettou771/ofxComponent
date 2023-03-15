@@ -2,6 +2,8 @@
 
 
 namespace ofxComponent {
+    shared_ptr<ofxComponentManager> ofxComponentManager::singleton = nullptr;
+
 	ofxComponentManager::ofxComponentManager() {
 	}
 
@@ -31,15 +33,17 @@ namespace ofxComponent {
 		ofAddListener(ofEvents().mouseReleased, this, &ofxComponentManager::mouseReleased, OF_EVENT_ORDER_BEFORE_APP);
 		ofAddListener(ofEvents().mouseScrolled, this, &ofxComponentManager::mouseScrolled, OF_EVENT_ORDER_BEFORE_APP);
 		ofAddListener(ofEvents().fileDragEvent, this, &ofxComponentManager::dragEvent, OF_EVENT_ORDER_BEFORE_APP);
+        
+        singleton = static_pointer_cast<ofxComponentManager>(shared_from_this());
 	}
 
 	void ofxComponentManager::update(ofEventArgs &args) {
         // check most top component
-        mostTopComponent = nullptr;
+        mouseOverComponent = nullptr;
         std::function<void(vector<shared_ptr<ofxComponentBase> >)> checkMostTop = [&](vector<shared_ptr<ofxComponentBase> > list){
             for (shared_ptr<ofxComponentBase> c : list) {
                 if (c->isMouseInside()) {
-                    mostTopComponent = c;
+                    mouseOverComponent = c;
                 }
                 vector<shared_ptr<ofxComponentBase> > clist = c->getChildren();
                 checkMostTop(clist);

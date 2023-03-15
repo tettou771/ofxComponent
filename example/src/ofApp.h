@@ -7,19 +7,14 @@ using namespace ofxComponent;
 
 // position coordination
 class YellowComponent : public ofxComponentBase {
-	void onStart() override {
-		setRect(ofRectangle(50, 100, 400, 300));
-		setRotation(30);
-		setScale(0.7);
-	}
 	void onDraw() override {
-		ofSetColor(ofColor::yellow);
+		ofSetColor(255, 204, 102); // yellow
 		ofDrawRectangle(0, 0, getWidth(), getHeight()); // getWidth(), getHeight() is Component's member
 
 		// draw cursor pos that is relative coordination.
 		if (0 < getMouseX() && getMouseX() < getWidth()
 			&& 0 < getMouseY() && getMouseY() < getHeight()) {
-			ofSetColor(ofColor::darkGray);
+			ofSetColor(51, 51, 51); // dark gray
 			ofDrawCircle(getMouseX(), getMouseY(), 10);
 
 			// draw local and global position
@@ -38,15 +33,18 @@ class YellowComponent : public ofxComponentBase {
 class BlueComponent : public ofxComponentBase {
 	void onStart() override {
         setMovable(true);
-		setRect(ofRectangle(20, 20, 100, 100));
+        setWidth(100);
+        setHeight(100);
+        // position is relative
+        setPos(ofVec2f(20, 20));
 	}
 	void onDraw() override {
 		// light color when dragging
 		if (getMoving()) {
-			ofSetColor(ofColor(100, 100, 255));
+			ofSetColor(102, 153, 204, 150); // blue transparent
 		}
 		else {
-			ofSetColor(ofColor::blue);
+            ofSetColor(102, 153, 204); // blue
 		}
 
 		ofDrawRectangle(0, 0, getWidth(), getHeight());
@@ -73,7 +71,7 @@ class RedComponent : public ofxComponentBase {
 		ofLog() << "RedComponent postUpdate()";
 	}
 	void onDraw() override {
-		ofSetColor(ofColor::red);
+        ofSetColor(204, 102, 102); // red
 		ofDrawRectangle(0, 0, getWidth(), getHeight());
 
 		ofSetColor(ofColor::white);
@@ -96,6 +94,92 @@ private:
 	shared_ptr<BlueComponent> blueInRed;
 };
 
+// button demo
+class PurpleButtonComponent : public ofxComponentBase {
+public:
+    void onDraw() override {
+        ofSetColor(153, 102, 204); // purple
+        ofDrawRectangle(0, 0, getWidth(), getHeight());
+        ofSetColor(ofColor::white);
+        ofNoFill();
+        ofSetLineWidth(2);
+        ofDrawRectangle(0, 0, getWidth(), getHeight());
+
+        // draw text with status
+        ofSetColor(ofColor::white);
+        if (isMouseOver()) {
+            // mouse pressing
+            if (isMousePressedOverComponent()) {
+                ofDrawBitmapString("Press", 10, 20);
+            }
+            // mouse hover
+            else {
+                ofDrawBitmapString("Hover", 10, 20);
+            }
+        }
+        // No mouse
+        else {
+            ofDrawBitmapString(name, 10, 20);
+        }
+    }
+    
+    // pressed event
+    void onMousePressed(ofMouseEventArgs& mouse) override {
+        // if on mouse
+        if (isMouseOver()) {
+            ofLogNotice("PurpleButtonComponent") << name << ": Mouse pressed !";
+        }
+    }
+    
+    string name;
+};
+
+// UI with button demo
+class GreenComponent : public ofxComponentBase {
+public:
+    void onStart() override {
+        // make purple buttons
+        
+        // overrap button
+        int numOverrapBtns = 3;
+        for (int i=0; i<numOverrapBtns; ++i) {
+        }
+
+        // button list
+        int numListBtns = 3;
+        for (int i=0; i<numListBtns; ++i) {
+            auto btn = make_shared<PurpleButtonComponent>();
+            btn->setWidth(200);
+            btn->setHeight(30);
+            btn->setPos(ofVec2f(10, 10 + i * 40));
+            btn->name = "Button" + ofToString(i);
+            addChild(btn);
+            
+            // set button event listener
+            ofAddListener(btn->mousePressedOverComponentEvents, this, &GreenComponent::onButtonPressed);
+        }
+
+        // overrap button
+        auto overrapBtn = make_shared<PurpleButtonComponent>();
+        overrapBtn->setWidth(150);
+        overrapBtn->setHeight(100);
+        overrapBtn->setPos(ofVec2f(120, 60));
+        overrapBtn->name = "Overrap Button";
+        addChild(overrapBtn);
+        ofAddListener(overrapBtn->mousePressedOverComponentEvents, this, &GreenComponent::onButtonPressed);
+    }
+    
+    void onDraw() override {
+        ofSetColor(102, 204, 153); // green
+        ofDrawRectangle(0, 0, getWidth(), getHeight());
+    }
+    
+    // button event
+    void onButtonPressed() {
+        ofLogNotice("GreenComponent") << "Button pressed event";
+    }
+};
+
 class ofApp : public ofBaseApp {
 
 public:
@@ -116,7 +200,4 @@ public:
 	void gotMessage(ofMessage msg);
 
 	shared_ptr<ofxComponentManager> manager;
-	shared_ptr<RedComponent> red;
-	shared_ptr<YellowComponent> yellow;
-	shared_ptr<BlueComponent> blue;
 };
