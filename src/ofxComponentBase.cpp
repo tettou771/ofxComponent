@@ -114,7 +114,9 @@ void ofxComponentBase::exit(ofEventArgs& args) {
 }
 
 void ofxComponentBase::start() {
-    allComponents.push_back(shared_from_this());
+    if (!destroyed) {
+        allComponents.push_back(shared_from_this());
+    }
     
     needStartExec = false;
     onStart();
@@ -492,7 +494,7 @@ void ofxComponentBase::setMoving(bool _moving) {
 }
 
 bool ofxComponentBase::getMoving() {
-    return movingComponent == shared_from_this();
+    return !needStartExec && movingComponent == shared_from_this();
 }
 
 bool ofxComponentBase::inside(ofVec2f p) {
@@ -599,9 +601,12 @@ void ofxComponentBase::destroy() {
     if (destroyed) return;
     
     destroyed = true;
-    destroyedComponents.push_back(shared_from_this());
     setMoving(false);
     
+    if (!needStartExec) {
+        destroyedComponents.push_back(shared_from_this());
+    }
+
     for (auto& c : children) {
         c->destroy();
     }
