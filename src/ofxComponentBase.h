@@ -105,10 +105,7 @@ namespace ofxComponent {
 		// On change position, size, scale, etc
 		virtual void onLocalMatrixChanged() {};
 		// Notify to others when localMatrixChanged.
-		struct LocalMatrixChangedEventArgs {
-			ofRectangle rect;
-		};
-		ofEvent<LocalMatrixChangedEventArgs> localMatrixChangedEvents;
+		ofEvent<void> localMatrixChangedEvents;
 
 		ofRectangle getRect();
 		ofRectangle getGlobalRect();

@@ -655,10 +655,7 @@ void ofxComponentBase::updateMatrix() {
     
     onLocalMatrixChanged();
     updateGlobalMatrix();
-
-    LocalMatrixChangedEventArgs args;
-    args.rect = rect;
-    ofNotifyEvent(localMatrixChangedEvents, args);
+    ofNotifyEvent(localMatrixChangedEvents);
 }
 
 void ofxComponentBase::updateGlobalMatrix() {
