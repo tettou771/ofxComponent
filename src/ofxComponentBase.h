@@ -102,7 +102,13 @@ namespace ofxComponent {
 		bool toggleKeyMouseEventEnabled();
 		bool getKeyMouseEventEnebled();
 
+		// On change position, size, scale, etc
 		virtual void onLocalMatrixChanged() {};
+		// Notify to others when localMatrixChanged.
+		struct LocalMatrixChangedEventArgs {
+			ofRectangle rect;
+		};
+		ofEvent<LocalMatrixChangedEventArgs> localMatrixChangedEvents;
 
 		ofRectangle getRect();
 		ofRectangle getGlobalRect();
