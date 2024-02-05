@@ -540,32 +540,35 @@ void ofxComponentBase::addChild(shared_ptr<ofxComponentBase>  _child) {
 }
 
 void ofxComponentBase::insertChild(shared_ptr<ofxComponentBase>  _child, int index) {
-    bool alreadyListed = false;
+    int alreadyListedIndex = -1;
     
     int i = 0;
     for (auto& c : children) {
         if (c == _child) {
-            alreadyListed = true;
             children.erase(children.begin() + i);
+            alreadyListedIndex = i;
             break;
         }
         ++i;
     }
     
+    int offsetIndex = index;
+    if (alreadyListedIndex < index) offsetIndex -= 1;
+    
     // add to back if index is over
-    if (children.size() <= index) {
+    if (children.size() <= offsetIndex) {
         children.push_back(_child);
     }
     
-    else if (0 <= index) {
-        children.insert(children.begin() + index, _child);
+    else if (0 <= offsetIndex) {
+        children.insert(children.begin() + offsetIndex, _child);
     }
     
     else {
         children.insert(children.begin(), _child);
     }
     
-    if (!alreadyListed) {
+    if (alreadyListedIndex == -1) {
         _child->setParent(shared_from_this());
     }
 }

@@ -220,10 +220,11 @@ namespace ofxComponent {
 		shared_ptr<ofxComponentBase> parent = nullptr;
 		vector<shared_ptr<ofxComponentBase>> children;
 
-	private:
-		typedef function<void()> TimerFunc;
+    public:
+        typedef function<void()> TimerFunc;
 
-		class Timer {
+    private:
+        class Timer {
 		public:
 			Timer(TimerFunc func, float wait);
 			TimerFunc function;
