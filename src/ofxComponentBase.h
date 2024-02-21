@@ -223,7 +223,6 @@ namespace ofxComponent {
     public:
         typedef function<void()> TimerFunc;
 
-    private:
         class Timer {
 		public:
 			Timer(TimerFunc func, float wait);
@@ -236,7 +235,7 @@ namespace ofxComponent {
 		vector<Timer*> timerFunctions;
 
 	public:
-		void addTimerFunction(TimerFunc func, float wait);
+		Timer* addTimerFunction(TimerFunc func, float wait);
 		void clearTimerFunctions();
 
 	protected:

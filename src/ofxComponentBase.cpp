@@ -144,8 +144,10 @@ void ofxComponentBase::globalActiveChanged(bool _globalActive) {
     }
 }
 
-void ofxComponentBase::addTimerFunction(TimerFunc func, float wait) {
-    timerFunctions.push_back(new Timer(func, wait));
+ofxComponentBase::Timer* ofxComponentBase::addTimerFunction(TimerFunc func, float wait) {
+    auto timer = new Timer(func, wait);
+    timerFunctions.push_back(timer);
+    return timer;
 }
 
 void ofxComponentBase::clearTimerFunctions() {
