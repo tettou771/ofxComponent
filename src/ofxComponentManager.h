@@ -21,5 +21,7 @@ namespace ofxComponent {
 		void dragEvent(ofDragInfo &);
         
         static shared_ptr<ofxComponentManager> singleton;
+    private:
+        void removeDestroyedObjects();
 	};
 }
