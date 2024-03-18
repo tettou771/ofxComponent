@@ -385,6 +385,10 @@ float ofxComponentBase::getGlobalRotation() {
     return rotationVec.z;
 }
 
+void ofxComponentBase::setRect(float x, float y, float width, float height) {
+    setRect(ofRectangle(x, y, width, height));
+}
+
 void ofxComponentBase::setRect(ofRectangle _rect) {
     if (isnan(_rect.x) || isnan(_rect.y) || isnan(_rect.width) || isnan(_rect.height)) return;
     if (rect == _rect) return;

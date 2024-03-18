@@ -122,6 +122,7 @@ namespace ofxComponent {
 		float getGlobalScale();
 		float getRotation();
 		float getGlobalRotation();
+        void setRect(float, float, float, float);
 		void setRect(ofRectangle);
 		void setPos(float, float);
 		void setPos(ofVec2f);
