@@ -38,27 +38,6 @@ namespace ofxComponent {
     }
     
     void ofxComponentManager::update(ofEventArgs &args) {
-        // check most top component
-        mouseOverComponent = nullptr;
-        std::function<void(vector<shared_ptr<ofxComponentBase> >)> checkMostTop = [&](vector<shared_ptr<ofxComponentBase> > list){
-            for (shared_ptr<ofxComponentBase> c : list) {
-                if (!c->getActive()) continue;
-                vector<shared_ptr<ofxComponentBase> > clist = c->getChildren();
-                if (c->isMouseInside()) {
-                    mouseOverComponent = c;
-                    if (c->getConstrain()) {
-                        checkMostTop(clist);
-                    }
-                }
-                if (!c->getConstrain()) {
-                    checkMostTop(clist);
-                }
-            }
-        };
-        
-        auto list = getChildren();
-        checkMostTop(list);
-        
         ofxComponentBase::update(args);
         
         removeDestroyedObjects();
@@ -78,22 +57,50 @@ namespace ofxComponent {
         ofxComponentBase::keyReleased(key);
     }
     void ofxComponentManager::mouseMoved(ofMouseEventArgs &mouse) {
+        checkMostTopComponent();
         ofxComponentBase::mouseMoved(mouse);
     }
     void ofxComponentManager::mousePressed(ofMouseEventArgs &mouse) {
+        checkMostTopComponent();
         ofxComponentBase::mousePressed(mouse);
     }
     void ofxComponentManager::mouseDragged(ofMouseEventArgs &mouse) {
+        checkMostTopComponent();
         ofxComponentBase::mouseDragged(mouse);
     }
     void ofxComponentManager::mouseReleased(ofMouseEventArgs &mouse) {
+        checkMostTopComponent();
         ofxComponentBase::mouseReleased(mouse);
     }
     void ofxComponentManager::mouseScrolled(ofMouseEventArgs &mouse) {
+        checkMostTopComponent();
         ofxComponentBase::mouseScrolled(mouse);
     }
     void ofxComponentManager::dragEvent(ofDragInfo &dragInfo) {
+        checkMostTopComponent();
         ofxComponentBase::dragEvent(dragInfo);
+    }
+    
+    void ofxComponentManager::checkMostTopComponent() {
+        mouseOverComponent = nullptr;
+        std::function<void(vector<shared_ptr<ofxComponentBase> >)> checkMostTop = [&](vector<shared_ptr<ofxComponentBase> > list){
+            for (shared_ptr<ofxComponentBase> c : list) {
+                if (!c->getActive()) continue;
+                vector<shared_ptr<ofxComponentBase> > clist = c->getChildren();
+                if (c->isMouseInside()) {
+                    mouseOverComponent = c;
+                    if (c->getConstrain()) {
+                        checkMostTop(clist);
+                    }
+                }
+                if (!c->getConstrain()) {
+                    checkMostTop(clist);
+                }
+            }
+        };
+        
+        auto list = getChildren();
+        checkMostTop(list);
     }
     
     void ofxComponentManager::removeDestroyedObjects() {

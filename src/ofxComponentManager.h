@@ -22,6 +22,7 @@ namespace ofxComponent {
         
         static shared_ptr<ofxComponentManager> singleton;
     private:
+        void checkMostTopComponent();
         void removeDestroyedObjects();
 	};
 }
