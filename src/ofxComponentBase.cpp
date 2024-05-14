@@ -193,7 +193,6 @@ void ofxComponentBase::keyReleased(ofKeyEventArgs& key) {
 
 void ofxComponentBase::mouseMoved(ofMouseEventArgs& mouse) {
     if (!isActive || !keyMouseEventEnabled) return;
-    if (constrain && !isMouseInside()) return;
     
     onMouseMoved(mouse);
     for (int i = 0; i < children.size(); ++i) {
@@ -204,7 +203,6 @@ void ofxComponentBase::mouseMoved(ofMouseEventArgs& mouse) {
 
 void ofxComponentBase::mousePressed(ofMouseEventArgs& mouse) {
     if (!isActive || !keyMouseEventEnabled) return;
-    if (constrain && !isMouseInside()) return;
     
     if (movable && isMouseOver()) {
         setMoving(true);
@@ -227,7 +225,6 @@ void ofxComponentBase::mousePressed(ofMouseEventArgs& mouse) {
 
 void ofxComponentBase::mouseDragged(ofMouseEventArgs& mouse) {
     if (!isActive || !keyMouseEventEnabled) return;
-    if (constrain && !isMouseInside()) return;
     
     if (getMoving()) {
         ofVec2f move = getMousePos() - getPreviousMousePos();
@@ -244,7 +241,6 @@ void ofxComponentBase::mouseReleased(ofMouseEventArgs& mouse) {
     mousePressedOverComponent = false;
 
     if (!isActive || !keyMouseEventEnabled) return;
-    if (constrain && !isMouseInside()) return;
     
     if (getMoving()) setMoving(false);
     
@@ -257,7 +253,6 @@ void ofxComponentBase::mouseReleased(ofMouseEventArgs& mouse) {
 
 void ofxComponentBase::mouseScrolled(ofMouseEventArgs& mouse) {
     if (!isActive || !keyMouseEventEnabled) return;
-    if (constrain && !isMouseInside()) return;
     
     onMouseScrolled(mouse);
     for (int i = 0; i < children.size(); ++i) {
@@ -268,7 +263,6 @@ void ofxComponentBase::mouseScrolled(ofMouseEventArgs& mouse) {
 
 void ofxComponentBase::dragEvent(ofDragInfo& dragInfo) {
     if (!isActive || !keyMouseEventEnabled) return;
-    if (constrain && !isMouseInside()) return;
     
     onDragEvent(dragInfo);
     for (int i = 0; i < children.size(); ++i) {
