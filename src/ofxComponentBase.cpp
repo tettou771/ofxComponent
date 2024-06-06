@@ -384,7 +384,7 @@ void ofxComponentBase::setRect(float x, float y, float width, float height) {
 }
 
 void ofxComponentBase::setRect(ofRectangle _rect) {
-    if (isnan(_rect.x) || isnan(_rect.y) || isnan(_rect.width) || isnan(_rect.height)) return;
+    if (!isfinite(_rect.x) || !isfinite(_rect.y) || !isfinite(_rect.width) || !isfinite(_rect.height)) return;
     if (rect == _rect) return;
     rect = _rect;
     updateMatrix();
@@ -421,24 +421,24 @@ void ofxComponentBase::setScaleAlignment(Alignment _alignment) {
 }
 
 void ofxComponentBase::setWidth(float _width) {
-    if (isnan(_width)) return;
+    if (!isfinite(_width)) return;
     setRect(ofRectangle(rect.x, rect.y, _width, rect.height));
 }
 
 void ofxComponentBase::setHeight(float _height) {
-    if (isnan(_height)) return;
+    if (!isfinite(_height)) return;
     setRect(ofRectangle(rect.x, rect.y, rect.width, _height));
 }
 
 void ofxComponentBase::setScale(float _scale) {
-    if (isnan(_scale)) return;
+    if (!isfinite(_scale)) return;
     if (scale == _scale) return;
     scale = _scale;
     updateMatrix();
 }
 
 void ofxComponentBase::setRotation(float _rotation) {
-    if (isnan(_rotation)) return;
+    if (!isfinite(_rotation)) return;
     if (rotation == _rotation) return;
     rotation = _rotation;
     updateMatrix();
