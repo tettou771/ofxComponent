@@ -64,7 +64,8 @@ void ofxComponentBase::draw(ofEventArgs& args) {
     if (!isActive || destroyed) return;
     
     ofPushMatrix();
-    ofMultMatrix(getLocalMatrix());
+    ofMatrix4x4 mat = getLocalMatrix();
+    ofMultMatrix(mat);
     
     // draw in constrainFbo
     bool isCurrentConstrain = constrain;
