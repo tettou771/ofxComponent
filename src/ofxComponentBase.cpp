@@ -6,13 +6,14 @@ vector<shared_ptr<ofxComponentBase> > ofxComponentBase::destroyedComponents;
 shared_ptr<ofxComponentBase> ofxComponentBase::movingComponent = nullptr;
 shared_ptr<ofxComponentBase>  ofxComponentBase::mouseOverComponent = nullptr;
 
+// ========================================================
+// ofxComponentBase
+// ========================================================
+
 ofxComponentBase::ofxComponentBase() {
 }
 
 ofxComponentBase::~ofxComponentBase() {
-    for (auto t : timerFunctions) {
-        delete t;
-    }
 }
 
 void ofxComponentBase::setup() {
@@ -25,26 +26,18 @@ void ofxComponentBase::setup() {
 
 void ofxComponentBase::update(ofEventArgs& args) {
     if (needStartExec) start();
-    
+        
     // exec expired timer functions
     if (!timerFunctions.empty()) {
         float now = ofGetElapsedTimef();
-        for (auto i = 0; i < timerFunctions.size(); ++i) {
-            {
-                auto tf = timerFunctions[i];
-                if (tf->canceled) {
-                    delete tf;
-                    timerFunctions.erase(timerFunctions.begin() + i);
-                    i--;
-                }
-                else if (tf->execTime <= now) {
-                    tf->function();
-                    delete tf;
-                    timerFunctions.erase(timerFunctions.begin() + i);
-                    i--;
-                }
-                else {
-                }
+
+        for (auto it = timerFunctions.begin(); it != timerFunctions.end(); ) {
+            auto &timer = *it;
+            // If time expired, run
+            if (timer->checkAndRunIfElapsed(now) || timer->isDone()) {
+                it = timerFunctions.erase(it);
+            } else {
+                ++it;
             }
         }
     }
@@ -145,16 +138,17 @@ void ofxComponentBase::globalActiveChanged(bool _globalActive) {
     }
 }
 
-ofxComponentBase::Timer* ofxComponentBase::addTimerFunction(TimerFunc func, float wait) {
-    auto timer = new Timer(func, wait);
+shared_ptr<ofxComponentBase::Timer> ofxComponentBase::addTimerFunction(TimerFunc func, float wait) {
+    auto timer = make_shared<Timer>(func, wait);
     timerFunctions.push_back(timer);
     return timer;
 }
 
 void ofxComponentBase::clearTimerFunctions() {
-    for (auto t : timerFunctions) {
-        t->canceled = true;
+    for (auto &t : timerFunctions) {
+        t->cancel();
     }
+    timerFunctions.clear();
 }
 
 bool ofxComponentBase::getGlobalActive() {
@@ -677,8 +671,49 @@ void ofxComponentBase::updateGlobalMatrix() {
         c->updateGlobalMatrix();
     }
 }
+
+// ========================================================
+// Timer
+// ========================================================
+
 ofxComponentBase::Timer::Timer(TimerFunc func, float wait)
-: function(func) {
-    execTime = wait + ofGetElapsedTimef();
+: function(func)
+{
+    execTime = ofGetElapsedTimef() + wait;
 }
 
+bool ofxComponentBase::Timer::run() {
+    if (done) return false;
+    // 1回だけ実行
+    if (function) {
+        function();
+    }
+    done = true;
+    return true;
+}
+
+void ofxComponentBase::Timer::cancel() {
+    done = true;
+}
+
+// get done (executed or canceled)
+bool ofxComponentBase::Timer::isDone() const {
+    return done;
+}
+
+float ofxComponentBase::Timer::getExecTime() {
+    return execTime;
+}
+
+void ofxComponentBase::Timer::shiftExecTime(const float sec) {
+    execTime += sec;
+}
+
+bool ofxComponentBase::Timer::checkAndRunIfElapsed(float now) {
+    if (done) return false;
+
+    if (execTime <= now) {
+        return run();
+    }
+    return false; // exec later
+}

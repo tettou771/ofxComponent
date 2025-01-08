@@ -225,18 +225,32 @@ namespace ofxComponent {
         typedef function<void()> TimerFunc;
 
         class Timer {
-		public:
-			Timer(TimerFunc func, float wait);
-			TimerFunc function;
-			float execTime;
-			bool canceled = false;
-		};
+        public:
+            Timer(TimerFunc func, float wait);
 
+            // Define only cancel and isDone,
+            // because it needs run once
+            bool run();             // execute the function
+            void cancel();
+            bool isDone() const;
+            float getExecTime();
+            void shiftExecTime(const float sec);
+
+            // Called in ofxComponentBase
+            bool checkAndRunIfElapsed(float now);
+
+        private:
+            TimerFunc function;
+            float execTime = 0.0f;
+            bool done = false;      // done: canceled or executed
+        };
+
+        typedef shared_ptr<Timer> TimerRef;
     protected:
-		vector<Timer*> timerFunctions;
+		vector<TimerRef> timerFunctions;
 
 	public:
-		Timer* addTimerFunction(TimerFunc func, float wait);
+        shared_ptr<ofxComponentBase::Timer> addTimerFunction(TimerFunc func, float wait);
 		void clearTimerFunctions();
 
 	protected:
