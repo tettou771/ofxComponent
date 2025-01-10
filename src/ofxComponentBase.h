@@ -246,11 +246,13 @@ namespace ofxComponent {
         };
 
         typedef shared_ptr<Timer> TimerRef;
-    protected:
+    private:
 		vector<TimerRef> timerFunctions;
-
+        vector<TimerRef> timerFunctionsToAdd;
+        void updateTimers();
 	public:
-        shared_ptr<ofxComponentBase::Timer> addTimerFunction(TimerFunc func, float wait);
+        shared_ptr<Timer> addTimerFunction(TimerFunc func, float wait);
+        vector<TimerRef> getTimerFunctions();
 		void clearTimerFunctions();
 
 	protected:

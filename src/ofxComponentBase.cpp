@@ -25,24 +25,14 @@ void ofxComponentBase::setup() {
 }
 
 void ofxComponentBase::update(ofEventArgs& args) {
-    if (needStartExec) start();
-        
-    // exec expired timer functions
-    if (!timerFunctions.empty()) {
-        float now = ofGetElapsedTimef();
-
-        for (auto it = timerFunctions.begin(); it != timerFunctions.end(); ) {
-            auto &timer = *it;
-            // If time expired, run
-            if (timer->checkAndRunIfElapsed(now) || timer->isDone()) {
-                it = timerFunctions.erase(it);
-            } else {
-                ++it;
-            }
-        }
-    }
+    if (destroyed) return;
     
-    if (!isActive || destroyed) return;
+    if (needStartExec) start();
+    
+    // Run timers even if disactived.
+    updateTimers();
+    
+    if (!isActive) return;
     
     onUpdate();
     for (int i = 0; i < children.size(); ++i) {
@@ -144,11 +134,61 @@ shared_ptr<ofxComponentBase::Timer> ofxComponentBase::addTimerFunction(TimerFunc
     return timer;
 }
 
+void ofxComponentBase::updateTimers() {
+    // 1) 追加予約中のタイマーがあれば、ここでまとめて本体に移してしまう
+    if (!timerFunctionsToAdd.empty()) {
+        for (auto &t : timerFunctionsToAdd) {
+            timerFunctions.push_back(t);
+        }
+        timerFunctionsToAdd.clear();
+    }
+
+    // 2) タイマーを実行
+    if (!timerFunctions.empty()) {
+        float now = ofGetElapsedTimef();
+        for (auto &timer : timerFunctions) {
+            // ここで checkAndRunIfElapsed
+            timer->checkAndRunIfElapsed(now);
+        }
+    }
+
+    // 3) 終了済のタイマーを erase する
+    timerFunctions.erase(
+        remove_if(
+            timerFunctions.begin(),
+            timerFunctions.end(),
+            [](const TimerRef &t) {
+                return t->isDone(); // done のやつは消す
+            }
+        ),
+        timerFunctions.end()
+    );
+}
+
+vector<ofxComponentBase::TimerRef> ofxComponentBase::getTimerFunctions() {
+    vector<TimerRef> result;
+    result.reserve(timerFunctions.size() + timerFunctionsToAdd.size());
+
+    // all timers
+    for (auto &timer : timerFunctions) {
+        result.push_back(timer);
+    }
+    for (auto &timer : timerFunctionsToAdd) {
+        result.push_back(timer);
+    }
+
+    return result;
+}
+
 void ofxComponentBase::clearTimerFunctions() {
     for (auto &t : timerFunctions) {
         t->cancel();
     }
-    timerFunctions.clear();
+    for (auto &timer : timerFunctionsToAdd) {
+        timer->cancel();
+    }
+    
+    // Don't clear vector, because avoid iteration error.
 }
 
 bool ofxComponentBase::getGlobalActive() {
