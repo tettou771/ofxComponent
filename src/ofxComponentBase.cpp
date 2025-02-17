@@ -49,44 +49,44 @@ void ofxComponentBase::draw(ofEventArgs& args) {
     ofPushMatrix();
     ofMatrix4x4 mat = getLocalMatrix();
     ofMultMatrix(mat);
-    
-    // draw in constrainFbo
-    bool isCurrentConstrain = constrain;
-    if (isCurrentConstrain) {
-        // resize fbo if needed
-        if (getWidth() > 0 && getHeight() > 0 &&
-            (getWidth() != constrainFbo.getWidth() || getHeight() != constrainFbo.getHeight())) {
-            constrainFbo.allocate(getWidth(), getHeight());
-        }
-        
-        if (!constrainFbo.isAllocated()) {
-            constrainFbo.allocate(MAX(1, getWidth()), MAX(1, getHeight()));
-        }
-        
-        // draw in fbo
-        constrainFbo.begin();
-        ofClear(0, 0, 0, 0);
+
+// draw in constrainFbo
+bool isCurrentConstrain = constrain;
+if (isCurrentConstrain) {
+    // resize fbo if needed
+    if (getWidth() > 0 && getHeight() > 0 &&
+        (getWidth() != constrainFbo.getWidth() || getHeight() != constrainFbo.getHeight())) {
+        constrainFbo.allocate(getWidth(), getHeight());
     }
-    
-    ofPushStyle();
-    onDraw();
-    ofPopStyle();
-    
-    for (int i = 0; i < children.size(); ++i) {
-        auto& c = children[i];
-        c->draw(args);
+
+    if (!constrainFbo.isAllocated()) {
+        constrainFbo.allocate(MAX(1, getWidth()), MAX(1, getHeight()));
     }
-    
-    ofPushStyle();
-    postDraw();
-    ofPopStyle();
-    
-    if (isCurrentConstrain) {
-        constrainFbo.end();
-        constrainFbo.draw(0, 0);
-    }
-    
-    ofPopMatrix();
+
+    // draw in fbo
+    constrainFbo.begin();
+    ofClear(0, 0, 0, 0);
+}
+
+ofPushStyle();
+onDraw();
+ofPopStyle();
+
+for (int i = 0; i < children.size(); ++i) {
+    auto& c = children[i];
+    c->draw(args);
+}
+
+ofPushStyle();
+postDraw();
+ofPopStyle();
+
+if (isCurrentConstrain) {
+    constrainFbo.end();
+    constrainFbo.draw(0, 0);
+}
+
+ofPopMatrix();
 }
 
 void ofxComponentBase::exit(ofEventArgs& args) {
@@ -101,7 +101,7 @@ void ofxComponentBase::start() {
     if (!destroyed) {
         allComponents.push_back(shared_from_this());
     }
-    
+
     needStartExec = false;
     onStart();
 }
@@ -112,7 +112,7 @@ void ofxComponentBase::setActive(bool active) {
     isActive = active;
     onActiveChanged(active);
     bool afterGlobal = getGlobalActive();
-    
+
     if (afterGlobal != beforeGlobal) {
         globalActiveChanged(afterGlobal);
     }
@@ -137,22 +137,32 @@ shared_ptr<ofxComponentBase::Timer> ofxComponentBase::addTimerFunction(TimerFunc
 void ofxComponentBase::updateTimers() {
     // 1) 追加予約中のタイマーがあれば、ここでまとめて本体に移してしまう
     if (!timerFunctionsToAdd.empty()) {
-        for (auto &t : timerFunctionsToAdd) {
+        for (auto& t : timerFunctionsToAdd) {
             timerFunctions.push_back(t);
         }
         timerFunctionsToAdd.clear();
     }
 
-    // 2) タイマーを実行
+    // 2) 実行するタイマーを一旦配列に集める（配列破壊防止）
+    vector<shared_ptr<Timer>> toRun;
     if (!timerFunctions.empty()) {
         float now = ofGetElapsedTimef();
-        for (auto &timer : timerFunctions) {
+        for (auto& timer : timerFunctions) {
             // ここで checkAndRunIfElapsed
-            timer->checkAndRunIfElapsed(now);
+            //timer->checkAndRunIfElapsed(now);
+            if (timer->checkElapsed(now)) {
+                toRun.push_back(timer);
+            }
         }
     }
 
-    // 3) 終了済のタイマーを erase する
+    // 3) タイマーを実行
+    for (auto& timer : toRun) {
+        timer->run();
+    }
+    toRun.clear();
+
+    // 4) 終了済のタイマーを erase する
     timerFunctions.erase(
         remove_if(
             timerFunctions.begin(),
@@ -747,6 +757,10 @@ float ofxComponentBase::Timer::getExecTime() {
 
 void ofxComponentBase::Timer::shiftExecTime(const float sec) {
     execTime += sec;
+}
+
+bool ofxComponentBase::Timer::checkElapsed(float now) {
+    return execTime <= now;
 }
 
 bool ofxComponentBase::Timer::checkAndRunIfElapsed(float now) {

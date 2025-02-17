@@ -191,7 +191,15 @@ namespace ofxComponent {
         inline shared_ptr<T> getThisAs() {
             return dynamic_pointer_cast<T>(shared_from_this());
         }
-        
+		// get weak_ptr
+		weak_ptr<ofxComponentBase> getWeak() {
+			return weak_from_this();
+		}
+		template<typename T>
+		inline std::weak_ptr<T> getWeakAs() {
+			return std::weak_ptr<T>(dynamic_pointer_cast<T>(shared_from_this()));
+		}
+
         // This is triggered when a button is pressed and the button is located at the top layer at that coordinate.
         // In this case, use ofAddListener() and provide the instance of this class's mousePressedTopEvents as the first argument.
         ofEvent<void> mousePressedOverComponentEvents;
@@ -237,6 +245,7 @@ namespace ofxComponent {
             void shiftExecTime(const float sec);
 
             // Called in ofxComponentBase
+			bool checkElapsed(float now);
             bool checkAndRunIfElapsed(float now);
 
         private:
