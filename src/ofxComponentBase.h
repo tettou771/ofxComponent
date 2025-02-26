@@ -196,6 +196,9 @@ namespace ofxComponent {
         // In this case, use ofAddListener() and provide the instance of this class's mousePressedTopEvents as the first argument.
         ofEvent<void> mousePressedOverComponentEvents;
 
+		void setTimerPaused(bool paused);
+		bool isTimerPaused() const { return timerPaused; }
+
 	private:
 		bool isActive = true;
 		bool keyMouseEventEnabled = true;
@@ -239,10 +242,15 @@ namespace ofxComponent {
             // Called in ofxComponentBase
             bool checkAndRunIfElapsed(float now);
 
+            void setPaused(bool paused);
+            bool isPaused() const { return paused; }
+
         private:
             TimerFunc function;
             float execTime = 0.0f;
             bool done = false;      // done: canceled or executed
+            bool paused = false;
+			float pauseStartTime = 0.0f;
         };
 
         typedef shared_ptr<Timer> TimerRef;
@@ -259,5 +267,6 @@ namespace ofxComponent {
 		static vector<shared_ptr<ofxComponentBase> > allComponents;
 		static vector<shared_ptr<ofxComponentBase> > destroyedComponents;
         static shared_ptr<ofxComponentBase> mouseOverComponent;
+        bool timerPaused = false;
 	};
 }

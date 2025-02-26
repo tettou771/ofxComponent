@@ -130,7 +130,13 @@ void ofxComponentBase::globalActiveChanged(bool _globalActive) {
 
 shared_ptr<ofxComponentBase::Timer> ofxComponentBase::addTimerFunction(TimerFunc func, float wait) {
     auto timer = make_shared<Timer>(func, wait);
-    timerFunctions.push_back(timer);
+    
+    // Set the paused state to match the current component state
+    if (timerPaused) {
+        timer->setPaused(true);
+    }
+    
+    timerFunctionsToAdd.push_back(timer);
     return timer;
 }
 
@@ -750,10 +756,40 @@ void ofxComponentBase::Timer::shiftExecTime(const float sec) {
 }
 
 bool ofxComponentBase::Timer::checkAndRunIfElapsed(float now) {
-    if (done) return false;
+    if (done || paused) return false;
 
     if (execTime <= now) {
         return run();
     }
     return false; // exec later
+}
+
+void ofxComponentBase::Timer::setPaused(bool _paused) {
+    if (paused == _paused) return;
+    paused = _paused;
+    
+    // Shift execution time by the pause duration when unpausing
+    if (!paused) {
+        shiftExecTime(ofGetElapsedTimef() - pauseStartTime);
+    } else {
+        pauseStartTime = ofGetElapsedTimef();
+    }
+}
+
+void ofxComponentBase::setTimerPaused(bool paused) {
+    if (timerPaused == paused) return;
+    timerPaused = paused;
+    
+    // Apply to all timers
+    for (auto& timer : timerFunctions) {
+        timer->setPaused(paused);
+    }
+    for (auto& timer : timerFunctionsToAdd) {
+        timer->setPaused(paused);
+    }
+    
+    // Propagate to children
+    for (auto& child : children) {
+        child->setTimerPaused(paused);
+    }
 }
