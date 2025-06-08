@@ -155,8 +155,7 @@ void ofxComponentBase::updateTimers() {
         float now = ofGetElapsedTimef();
         for (auto& timer : timerFunctions) {
             // ここで checkAndRunIfElapsed
-            //timer->checkAndRunIfElapsed(now);
-            if (timer->checkElapsed(now)) {
+            if (timer->checkAndRunIfElapsed(now)) {
                 toRun.push_back(timer);
             }
         }
