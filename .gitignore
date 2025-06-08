@@ -1,6 +1,6 @@
-example/*
-!example/src
-!example/addons.make
+example*/*
+!example*/src
+!example*/addons.make
 
 # osx
 .DS_Store
