@@ -14,7 +14,7 @@ namespace ofxComponent {
 		Center
 	};
 
-	class ofxComponentBase : public enable_shared_from_this<ofxComponentBase> {
+	class ofxComponentBase : public std::enable_shared_from_this<ofxComponentBase> {
 	public:
 		ofxComponentBase();
 		~ofxComponentBase();
@@ -233,7 +233,7 @@ namespace ofxComponent {
 		vector<shared_ptr<ofxComponentBase>> children;
 
     public:
-        typedef function<void()> TimerFunc;
+        typedef std::function<void()> TimerFunc;
 
         class Timer {
         public:
